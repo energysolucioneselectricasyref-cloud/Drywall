@@ -7,8 +7,8 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; color: #333; margin: 0; padding: 20px; background-color: #f9f9f9; }
         .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; margin-bottom: 20px; }
-        .company-info h1 { margin: 0; color: #3b82f6; font-size: 28px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f27405; padding-bottom: 20px; margin-bottom: 20px; }
+        .company-info h1 { margin: 0; color: #f27405; font-size: 28px; }
         .invoice-details { text-align: right; }
         .details-section { display: flex; justify-content: space-between; margin-bottom: 30px; }
         .details-box { width: 48%; }
@@ -18,10 +18,10 @@
         td { padding: 12px; border-bottom: 1px solid #eee; }
         .totals { display: flex; justify-content: flex-end; }
         .totals-table { width: 40%; }
-        .totals-table tr:last-child td { font-weight: bold; color: #3b82f6; border-top: 2px solid #3b82f6; }
+        .totals-table tr:last-child td { font-weight: bold; color: #f27405; border-top: 2px solid #f27405; }
         .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
         .loading { text-align: center; font-size: 18px; padding: 50px; color: #666; }
-        @media print { body { background-color: #fff; padding: 0; } .invoice-box { box-shadow: none; border: none; padding: 0; } }
+        @media print { body { background-color: #fff; padding: 0; } .invoice-box { box-shadow: none; border: none; padding: 0; } button { display: none; } }
     </style>
 </head>
 <body>
@@ -31,8 +31,8 @@
 <div id="invoice" class="invoice-box" style="display: none;">
     <div class="header">
         <div class="company-info">
-            <h1>Calculadora 9.0 Drywall</h1>
-            <p>Soluciones en Construcción Liviana</p>
+            <h1>Energy Soluciones Eléctricas y Refrigeración</h1>
+            <p>Soluciones de Calidad y Confianza</p>
         </div>
         <div class="invoice-details">
             <h2>FACTURA</h2>
@@ -63,7 +63,7 @@
         </thead>
         <tbody>
             <tr>
-                <td>Instalación y Materiales de Drywall para <span id="inv-desc-nombre"></span></td>
+                <td>Instalación y Materiales para <span id="inv-desc-nombre"></span></td>
                 <td style="text-align: right;"><span id="inv-area"></span> m²</td>
                 <td style="text-align: right;"><span id="inv-desperdicio"></span>%</td>
             </tr>
@@ -74,19 +74,18 @@
         <table class="totals-table">
             <tr>
                 <td>Total Estimado:</td>
-                <td style="text-align: right; font-weight: bold; color: #3b82f6;"><span id="inv-total"></span> m²</td>
+                <td style="text-align: right; font-weight: bold; color: #f27405;"><span id="inv-total"></span> m²</td>
             </tr>
         </table>
     </div>
 
     <div class="footer">
-        <p>Gracias por confiar en nosotros para tu proyecto de Drywall.</p>
-        <button onclick="window.print()" style="margin-top:10px; padding:8px 15px; background:#3b82f6; color:#fff; border:none; border-radius:4px; cursor:pointer;">Imprimir Factura</button>
+        <p>Gracias por confiar en nosotros.</p>
+        <button onclick="window.print()" style="margin-top:10px; padding:8px 15px; background:#f27405; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Imprimir Factura</button>
     </div>
 </div>
 
 <script>
-    // 1. Obtener el ID del proyecto desde la URL (?id=xxxx)
     const urlParams = new URLSearchParams(window.location.search);
     const proyectoId = urlParams.get('id');
 
@@ -96,14 +95,14 @@
         cargarDatosProyecto(proyectoId);
     }
 
-    // 2. Conectar con AppSheet API para traer la información
     async function cargarDatosProyecto(id) {
-        const appId = "AQUÍ_TU_APP_ID"; // Reemplaza con el ID de tu App (está en la URL de tu AppSheet)
-        const accessKey = "AQUÍ_TU_API_KEY"; // Generada en AppSheet (Manage -> Integrations -> IN)
+        // ⚠️ REEMPLAZA ESTOS DOS VALORES CON TUS CREDENCIALES REALES DE APPSHEET
+        const appId = "AQUÍ_PON_TU_APP_ID"; 
+        const accessKey = "AQUÍ_PON_TU_API_KEY"; 
         const tableName = "Proyectos";
 
         try {
-            const response = await fetch(`https://appsheet.com{appId}/tables/${tableName}/Action`, {
+            const response = await fetch("https://appsheet.com" + appId + "/tables/" + tableName + "/Action", {
                 method: 'POST',
                 headers: {
                     'applicationAccessKey': accessKey,
@@ -112,16 +111,15 @@
                 body: JSON.stringify({
                     "Action": "Find",
                     "Properties": { "Locale": "es-ES" },
-                    "Rows": [ { "ID_Proyecto": id } ] // Reemplaza "ID_Proyecto" por el nombre exacto de tu llave primaria
+                    "Rows": [ { "ID_Proyecto": id } ]
                 })
             });
 
             const data = await response.json();
             
             if (data && data.length > 0) {
-                const proyecto = data[0];
+                const proyecto = data[0]; // Corregido para tomar el primer registro devuelto
 
-                // 3. Inyectar los datos recibidos en el HTML
                 document.getElementById('inv-id').innerText = proyecto.ID_Proyecto || id;
                 document.getElementById('inv-fecha').innerText = proyecto.Fecha || 'N/A';
                 document.getElementById('inv-cliente').innerText = proyecto.Cliente || 'N/A';
@@ -133,7 +131,6 @@
                 document.getElementById('inv-desperdicio').innerText = proyecto.Porcentaje_Desperdicio || '0';
                 document.getElementById('inv-total').innerText = proyecto.Area_Total || '0';
 
-                // Mostrar la factura y ocultar el cargador
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('invoice').style.display = 'block';
             } else {
