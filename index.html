@@ -106,12 +106,12 @@
     const idProyecto = urlParams.get('id');
     const accessKey = urlParams.get('key'); 
 
-    if (!idProyecto) {
+    if (!ID_Proyecto) {
         document.getElementById('loading').innerText = "Error: Parámetro 'id' no detectado en la URL.";
     } else if (!accessKey) {
         document.getElementById('loading').innerText = "Error: Permiso de seguridad 'key' ausente.";
     } else {
-        ejecutarCargaDeFactura(idProyecto);
+        ejecutarCargaDeFactura(ID_Proyecto);
     }
 
     async function ejecutarCargaDeFactura(id) {
