@@ -7,45 +7,27 @@
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; margin: 0; padding: 20px; background-color: #f9f9f9; }
         .invoice-box { max-width: 500px; margin: auto; padding: 25px; border: 1px solid #ddd; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
-        
-        /* Encabezado Logo Estilo OSUL */
         .header-logo { text-align: center; margin-bottom: 25px; }
         .logo-placeholder { background-color: #000; color: #00e5ff; display: inline-block; padding: 15px 30px; border-radius: 50%; font-weight: bold; border: 3px double #00e5ff; text-shadow: 0 0 5px #00e5ff; box-shadow: inset 0 0 10px rgba(0,229,255,0.5); }
         .logo-placeholder h2 { margin: 0; font-size: 26px; letter-spacing: 2px; }
         .logo-placeholder p { margin: 0; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Información General */
         .project-info { font-size: 14px; line-height: 1.6; margin-bottom: 25px; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
         .project-info p { margin: 4px 0; }
-
-        /* Título de Sección */
         .section-title { text-align: center; font-size: 16px; font-weight: bold; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Tabla de Materiales */
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; margin-bottom: 25px; }
         th { background-color: #f4f6f9; padding: 8px; border: 1px solid #ddd; font-weight: bold; text-transform: uppercase; }
         td { padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-
-        /* Sección de Código de Barras */
         .barcode-section { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 5px solid #000; }
         .barcode { font-family: 'Libre Barcode 39', 'Courier New', monospace; font-size: 42px; margin: 5px 0; display: block; letter-spacing: 2px; }
         .barcode-text { font-size: 14px; font-weight: bold; letter-spacing: 1px; }
-
-        /* Botón de Impresión e Interfaz */
         .no-print-zone { text-align: center; margin-bottom: 20px; }
         .btn-print { padding: 10px 20px; background: #000; color: #fff; border: 1px solid #00e5ff; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 5px rgba(0,229,255,0.3); }
         .btn-print:hover { background: #00e5ff; color: #000; }
         .loading { text-align: center; font-size: 16px; padding: 50px; color: #666; }
-
-        @media print { 
-            body { background-color: #fff; padding: 0; } 
-            .invoice-box { box-shadow: none; border: none; padding: 0; max-width: 100%; } 
-            .no-print-zone { display: none; } 
-        }
+        @media print { body { background-color: #fff; padding: 0; } .invoice-box { box-shadow: none; border: none; padding: 0; max-width: 100%; } .no-print-zone { display: none; } }
     </style>
-    <!-- Fuente para simular código de barras si no hay imagen -->
     <link href="https://googleapis.com" rel="stylesheet">
 </head>
 <body>
@@ -57,8 +39,6 @@
 <div id="loading" class="loading">Buscando registros en el sistema Drywall...</div>
 
 <div id="invoice" class="invoice-box" style="display: none;">
-    
-    <!-- Logo e Identidad -->
     <div class="header-logo">
         <div class="logo-placeholder">
             <h2>OSUL</h2>
@@ -66,7 +46,6 @@
         </div>
     </div>
 
-    <!-- Metadatos de Cabecera -->
     <div class="project-info">
         <p><strong>• Cliente:</strong> <span id="inv-cliente"></span></p>
         <p><strong>• Proyecto:</strong> <span id="inv-nombre"></span></p>
@@ -77,7 +56,6 @@
 
     <div class="section-title">Detalle Materiales</div>
 
-    <!-- Tabla Dinámica -->
     <table>
         <thead>
             <tr>
@@ -87,12 +65,9 @@
                 <th class="text-right">Costo Total</th>
             </tr>
         </thead>
-        <tbody id="materiales-rows">
-            <!-- JavaScript inyectará las filas de manera dinámica -->
-        </tbody>
+        <tbody id="materiales-rows"></tbody>
     </table>
 
-    <!-- Código de Barras Inferior -->
     <div class="barcode-section">
         <span class="barcode">|||||||||||||||||||||||||||||</span>
         <div class="barcode-text" id="inv-barcode-id">FAC-001</div>
@@ -106,17 +81,17 @@
     const idProyecto = urlParams.get('id');
     const accessKey = urlParams.get('key'); 
 
-    if (!ID_Proyecto) {
+    if (!idProyecto) {
         document.getElementById('loading').innerText = "Error: Parámetro 'id' no detectado en la URL.";
     } else if (!accessKey) {
         document.getElementById('loading').innerText = "Error: Permiso de seguridad 'key' ausente.";
     } else {
-        ejecutarCargaDeFactura(ID_Proyecto);
+        ejecutarCargaDeFactura(idProyecto);
     }
 
-        async function ejecutarCargaDeFactura(id) {
+    async function ejecutarCargaDeFactura(id) {
         try {
-            // 1. Obtener Datos Generales de la Tabla Proyectos
+            // 1. Consulta Tabla Proyectos
             const proyResponse = await fetch(`https://appsheet.com{appId}/tables/Proyectos/Action`, {
                 method: 'POST',
                 headers: { 'applicationAccessKey': accessKey, 'Content-Type': 'application/json' },
@@ -128,14 +103,15 @@
             });
             const proyData = await proyResponse.json();
 
-            // CORRECCIÓN AQUÍ: Validar que devuelva un array y tomar el primer elemento [0]
             if (!proyData || !Array.isArray(proyData) || proyData.length === 0) {
                 document.getElementById('loading').innerText = "No se encontró ningún proyecto con el ID especificado.";
                 return;
             }
-            const proyecto = proyData[0]; // Captura la fila real del proyecto
+            
+            // Garantizar la lectura correcta del objeto de datos
+            const proyecto = proyData[0]; 
 
-            // 2. Obtener Todos los Materiales Asociados
+            // 2. Consulta Tabla Detalle_Materiales
             const matResponse = await fetch(`https://appsheet.com{appId}/tables/Detalle_Materiales/Action`, {
                 method: 'POST',
                 headers: { 'applicationAccessKey': accessKey, 'Content-Type': 'application/json' },
@@ -147,13 +123,12 @@
             });
             const matData = await matResponse.json();
 
-            // Filtrar los materiales asegurando que sea un array válido
             let materialesFiltrados = [];
             if (matData && Array.isArray(matData)) {
                 materialesFiltrados = matData.filter(item => String(item.ID_Proyecto).trim() === String(id).trim());
             }
 
-            // 3. Pintar Datos del Proyecto en la Interfaz
+            // 3. Inyectar datos generales en los elementos HTML
             document.getElementById('inv-cliente').innerText = proyecto.Cliente || 'N/A';
             document.getElementById('inv-nombre').innerText = proyecto.Nombre_Proyecto || 'N/A';
             document.getElementById('inv-fecha').innerText = proyecto.Fecha || 'N/A';
@@ -162,7 +137,7 @@
             document.getElementById('inv-area').innerText = proyecto.Area_Total || '0.00';
             document.getElementById('inv-barcode-id').innerText = proyecto.ID_Proyecto || id;
 
-            // 4. Construir la Tabla de Materiales de Forma Dinámica
+            // 4. Inyectar filas de materiales
             const tbody = document.getElementById('materiales-rows');
             tbody.innerHTML = "";
 
@@ -171,7 +146,6 @@
             } else {
                 materialesFiltrados.forEach(mat => {
                     const tr = document.createElement('tr');
-                    
                     const nombreMaterial = mat.Material || 'Insumo';
                     const unidad = mat.Unidad || 'Unidad';
                     const cantidad = mat.Cantidad_Calculada || '0';
@@ -187,13 +161,13 @@
                 });
             }
 
-            // Desplegar la estructura final de la factura y ocultar el cargando
+            // Mostrar el diseño final y apagar pantalla de espera
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
         } catch (error) {
             console.error(error);
-            document.getElementById('loading').innerText = "Error crítico de comunicación con el servidor AppSheet.";
+            document.getElementById('loading').innerText = "Error de comunicación con el servidor de AppSheet.";
         }
     }
 </script>
