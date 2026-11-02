@@ -114,7 +114,7 @@
         ejecutarCargaDeFactura(ID_Proyecto);
     }
 
-    async function ejecutarCargaDeFactura(id) {
+    async function ejecutarCargaDeFactura(ID_Proyecto) {
         try {
             // 1. Obtener Datos Generales de la Tabla Proyectos
             const proyResponse = await fetch(`https://appsheet.com{appId}/tables/Proyectos/Action`, {
@@ -123,7 +123,7 @@
                 body: JSON.stringify({
                     "Action": "Find",
                     "Properties": { "Locale": "es-ES" },
-                    "Rows": [ { "ID_Proyecto": id } ]
+                    "Rows": [ { "ID_Proyecto": ID_Proyecto} ]
                 })
             });
             const proyData = await proyResponse.json();
