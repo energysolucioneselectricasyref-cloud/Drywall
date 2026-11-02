@@ -114,7 +114,7 @@
         ejecutarCargaDeFactura(ID_Proyecto);
     }
 
-    async function ejecutarCargaDeFactura(ID_Proyecto) {
+        async function ejecutarCargaDeFactura(id) {
         try {
             // 1. Obtener Datos Generales de la Tabla Proyectos
             const proyResponse = await fetch(`https://appsheet.com{appId}/tables/Proyectos/Action`, {
@@ -123,16 +123,17 @@
                 body: JSON.stringify({
                     "Action": "Find",
                     "Properties": { "Locale": "es-ES" },
-                    "Rows": [ { "ID_Proyecto": ID_Proyecto} ]
+                    "Rows": [ { "ID_Proyecto": id } ]
                 })
             });
             const proyData = await proyResponse.json();
 
-            if (!proyData || proyData.length === 0) {
+            // CORRECCIÓN AQUÍ: Validar que devuelva un array y tomar el primer elemento [0]
+            if (!proyData || !Array.isArray(proyData) || proyData.length === 0) {
                 document.getElementById('loading').innerText = "No se encontró ningún proyecto con el ID especificado.";
                 return;
             }
-            const proyecto = proyData[0];
+            const proyecto = proyData[0]; // Captura la fila real del proyecto
 
             // 2. Obtener Todos los Materiales Asociados
             const matResponse = await fetch(`https://appsheet.com{appId}/tables/Detalle_Materiales/Action`, {
@@ -146,7 +147,11 @@
             });
             const matData = await matResponse.json();
 
-            const materialesFiltrados = matData.filter(item => String(item.ID_Proyecto).trim() === String(id).trim());
+            // Filtrar los materiales asegurando que sea un array válido
+            let materialesFiltrados = [];
+            if (matData && Array.isArray(matData)) {
+                materialesFiltrados = matData.filter(item => String(item.ID_Proyecto).trim() === String(id).trim());
+            }
 
             // 3. Pintar Datos del Proyecto en la Interfaz
             document.getElementById('inv-cliente').innerText = proyecto.Cliente || 'N/A';
@@ -182,7 +187,7 @@
                 });
             }
 
-            // Desplegar la estructura final de impresión
+            // Desplegar la estructura final de la factura y ocultar el cargando
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
