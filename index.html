@@ -17,6 +17,7 @@
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; margin-bottom: 25px; }
         th { background-color: #f4f6f9; padding: 8px; border: 1px solid #ddd; font-weight: bold; text-transform: uppercase; }
         td { padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
+        tr.total-row td { font-weight: bold; background-color: #f8fafc; font-size: 13px; border-top: 2px solid #333; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .barcode-section { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 5px solid #000; }
@@ -28,7 +29,6 @@
         .loading { text-align: center; font-size: 16px; padding: 50px; color: #666; }
         @media print { body { background-color: #fff; padding: 0; } .invoice-box { box-shadow: none; border: none; padding: 0; max-width: 100%; } .no-print-zone { display: none; } }
     </style>
-    <!-- Se incluye la fuente para el código de barras legible por fuentes estándar si no carga el lector -->
     <link href="https://googleapis.com" rel="stylesheet">
 </head>
 <body>
@@ -67,6 +67,12 @@
             </tr>
         </thead>
         <tbody id="materiales-rows"></tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="3" class="text-right">TOTAL:</td>
+                <td id="inv-total-general" class="text-right">$0.00</td>
+            </tr>
+        </tfoot>
     </table>
 
     <div class="barcode-section">
@@ -92,7 +98,6 @@
 
     async function ejecutarCargaDeFactura(id) {
         try {
-            // Corregido el endpoint de AppSheet API estructurando la URL correctamente
             const baseUrl = `https://appsheet.com{appId}/tables`;
 
             // 1. Consulta Tabla Proyectos
@@ -141,13 +146,12 @@
             
             const txtID = proyecto.ID_Proyecto || id;
             document.getElementById('inv-barcode-id').innerText = txtID;
-            
-            // Requerimiento del formato Libre Barcode 39 (requiere asteriscos como delimitadores de inicio/fin)
             document.getElementById('visual-barcode').innerText = `*${txtID}*`;
 
-            // 4. Inyectar filas de materiales corregido y completado sin truncar
+            // 4. Inyectar filas de materiales y sumar los costos totales
             const tbody = document.getElementById('materiales-rows');
             tbody.innerHTML = "";
+            let sumaTotalAcumulada = 0;
 
             if (materialesFiltrados.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: #999;">No hay materiales calculados registrados para este proyecto.</td></tr>`;
@@ -156,28 +160,30 @@
                     const tr = document.createElement('tr');
                     const nombreMaterial = mat.ID_Material || mat.Material || 'Insumo';
                     const unidad = mat.Unidad || 'Unidad';
-                    const cantidad = parseFloat(mat.Cantidad_Calculada || 0).toFixed(2);
-                    const costo = mat.Costo_Total ? `$${parseFloat(mat.Costo_Total).toLocaleString('es-CO', {minimumFractionDigits: 2})}` : '$0.00';
+                    const cantidad = mat.Cantidad_Calculada ? parseFloat(mat.Cantidad_Calculada).toFixed(2) : '0.00';
+                    
+                    // Procesar valor numérico para la sumatoria quitando formato de texto si viene de AppSheet
+                    const costoNumerico = mat.Costo_Total ? parseFloat(String(mat.Costo_Total).replace(/[^0-9.-]+/g,"")) : 0;
+                    sumaTotalAcumulada += costoNumerico;
+
+                    const costoFormateado = `$${costoNumerico.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
                     tr.innerHTML = `
                         <td>${nombreMaterial}</td>
                         <td class="text-center">${unidad}</td>
                         <td class="text-right">${cantidad}</td>
-                        <td class="text-right">${costo}</td>
+                        <td class="text-right">${costoFormateado}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
-            // Ocultar cargador y mostrar la factura renderizada
+            // Inyectar el gran total calculado en la celda del tfoot
+            document.getElementById('inv-total-general').innerText = `$${sumaTotalAcumulada.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
+
+            // Cambiar visibilidad de la interfaz
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
         } catch (error) {
-            console.error(error);
-            document.getElementById('loading').innerText = "Error crítico al comunicar con la base de datos de AppSheet.";
-        }
-    }
-</script>
-</body>
-</html>
+            console.error("Error detectado en AppSheet Fetch API:", error);
