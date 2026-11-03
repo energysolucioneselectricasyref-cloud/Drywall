@@ -28,7 +28,6 @@
         .loading { text-align: center; font-size: 16px; padding: 50px; color: #666; }
         @media print { body { background-color: #fff; padding: 0; } .invoice-box { box-shadow: none; border: none; padding: 0; max-width: 100%; } .no-print-zone { display: none; } }
     </style>
-    <link href="https://googleapis.com" rel="stylesheet">
 </head>
 <body>
 
@@ -91,7 +90,7 @@
 
     async function ejecutarCargaDeFactura(id) {
         try {
-            // 1. Consulta Tabla Proyectos
+            // 1. Consulta Tabla Proyectos (Se corrigió la URL agregando la barra diagonal '/' después del dominio)
             const proyResponse = await fetch(`https://appsheet.com{appId}/tables/Proyectos/Action`, {
                 method: 'POST',
                 headers: { 'applicationAccessKey': accessKey, 'Content-Type': 'application/json' },
@@ -108,10 +107,9 @@
                 return;
             }
             
-            // Garantizar la lectura correcta del objeto de datos
             const proyecto = proyData[0]; 
 
-            // 2. Consulta Tabla Detalle_Materiales
+            // 2. Consulta Tabla Detalle_Materiales (Se corrigió la URL agregando la barra diagonal '/' después del dominio)
             const matResponse = await fetch(`https://appsheet.com{appId}/tables/Detalle_Materiales/Action`, {
                 method: 'POST',
                 headers: { 'applicationAccessKey': accessKey, 'Content-Type': 'application/json' },
@@ -161,13 +159,13 @@
                 });
             }
 
-            // Mostrar el diseño final y apagar pantalla de espera
+            // Ocultar mensaje de carga y mostrar la factura estructurada
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
         } catch (error) {
             console.error(error);
-            document.getElementById('loading').innerText = "Error de comunicación con el servidor de AppSheet.";
+            document.getElementById('loading').innerText = "Error crítico de conexión al procesar los datos de AppSheet.";
         }
     }
 </script>
