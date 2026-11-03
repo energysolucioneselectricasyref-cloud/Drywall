@@ -37,7 +37,7 @@
     <button class="btn-print" onclick="window.print()">Imprimir Factura</button>
 </div>
 
-<div id="loading" class="loading">Buscando registros en el sistema Drywall...</div>
+<div id="loading" class="loading">Cargando datos del documento...</div>
 
 <div id="invoice" class="invoice-box" style="display: none;">
     <div class="header-logo">
@@ -48,11 +48,12 @@
     </div>
 
     <div class="project-info">
+        <p><strong>• Tipo Documento:</strong> <span id="inv-tipo-doc"></span></p>
         <p><strong>• Cliente:</strong> <span id="inv-cliente"></span></p>
-        <p><strong>• Proyecto:</strong> <span id="inv-nombre"></span></p>
+        <p><strong>• ID Cliente:</strong> <span id="inv-cli-id"></span></p>
         <p><strong>• Fecha:</strong> <span id="inv-fecha"></span></p>
-        <p><strong>• Dimensiones:</strong> <span id="inv-largo"></span> m × <span id="inv-ancho"></span> m</p>
-        <p><strong>• Área Total:</strong> <span id="inv-area"></span> m²</p>
+        <p><strong>• Estado:</strong> <span id="inv-estado"></span></p>
+        <p><strong>• Método de Pago:</strong> <span id="inv-metodo"></span></p>
     </div>
 
     <div class="section-title">Detalle Materiales</div>
@@ -60,16 +61,15 @@
     <table>
         <thead>
             <tr>
-                <th>Material</th>
-                <th class="text-center">Unidad</th>
-                <th class="text-right">Cantidad Calculada</th>
+                <th>Material / Servicio</th>
+                <th class="text-right">Cantidad</th>
                 <th class="text-right">Costo Total</th>
             </tr>
         </thead>
         <tbody id="materiales-rows"></tbody>
         <tfoot>
             <tr class="total-row">
-                <td colspan="3" class="text-right">TOTAL:</td>
+                <td colspan="2" class="text-right">TOTAL:</td>
                 <td id="inv-total-general" class="text-right">$0.00</td>
             </tr>
         </tfoot>
@@ -82,95 +82,62 @@
 </div>
 
 <script>
-    const appId = "22eef414-0edc-4b1e-916a-ea9e07f970e2"; 
-
+    // Captura los parámetros de la URL enviados desde AppSheet
     const urlParams = new URLSearchParams(window.location.search);
-    const idProyecto = urlParams.get('id');
-    const accessKey = urlParams.get('key'); 
+    const boleta = urlParams.get('boleta');
 
-    if (!idProyecto) {
-        document.getElementById('loading').innerText = "Error: Parámetro 'id' no detectado en la URL.";
-    } else if (!accessKey) {
-        document.getElementById('loading').innerText = "Error: Permiso de seguridad 'key' ausente.";
+    if (!boleta) {
+        document.getElementById('loading').innerText = "Error: Parámetro 'boleta' (ID de proyecto) no detectado en la URL.";
     } else {
-        ejecutarCargaDeFactura(idProyecto);
+        generarFacturaDirecta();
     }
 
-    async function ejecutarCargaDeFactura(id) {
+    function generarFacturaDirecta() {
         try {
-            const baseUrl = `https://appsheet.com{appId}/tables`;
-
-            // 1. Consulta Tabla Proyectos
-            const proyResponse = await fetch(`${baseUrl}/Proyectos/Action`, {
-                method: 'POST',
-                headers: { 'applicationAccessKey': accessKey, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "Action": "Find",
-                    "Properties": { "Locale": "es-ES" },
-                    "Rows": [ { "ID_Proyecto": id } ]
-                })
-            });
-            const proyData = await proyResponse.json();
-
-            if (!proyData || !Array.isArray(proyData) || proyData.length === 0) {
-                document.getElementById('loading').innerText = "No se encontró ningún proyecto con el ID especificado.";
-                return;
-            }
+            // 1. Extraer los datos generales de la URL
+            document.getElementById('inv-tipo-doc').innerText = urlParams.get('tipo_doc') || 'Cotización';
+            document.getElementById('inv-cliente').innerText = urlParams.get('mesa') || 'N/A';
+            document.getElementById('inv-cli-id').innerText = urlParams.get('cli_id') || 'N/A';
+            document.getElementById('inv-fecha').innerText = urlParams.get('fecha') || 'N/A';
+            document.getElementById('inv-estado').innerText = urlParams.get('estado') || 'N/A';
+            document.getElementById('inv-metodo').innerText = urlParams.get('metodo_pago') || 'N/A';
             
-            const proyecto = proyData[0]; 
+            document.getElementById('inv-barcode-id').innerText = boleta;
+            document.getElementById('visual-barcode').innerText = `*${boleta}*`;
 
-            // 2. Consulta Tabla Detalle_Materiales
-            const matResponse = await fetch(`${baseUrl}/Detalle_Materiales/Action`, {
-                method: 'POST',
-                headers: { 'applicationAccessKey': accessKey, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "Action": "Find",
-                    "Properties": { "Locale": "es-ES" },
-                    "Rows": []
-                })
-            });
-            const matData = await matResponse.json();
+            // 2. Procesar y descomponer las listas separadas por comas (, )
+            const rawServicios = urlParams.get('servicios') || '';
+            const rawCantidades = urlParams.get('cantidades') || '';
+            const rawPrecios = urlParams.get('p_unit') || '';
 
-            let materialesFiltrados = [];
-            if (matData && Array.isArray(matData)) {
-                materialesFiltrados = matData.filter(item => String(item.ID_Proyecto).trim() === String(id).trim());
-            }
+            // Convertir cadenas de texto en arreglos limpios independientes
+            const listaServicios = rawServicios ? rawServicios.split(',') : [];
+            const listaCantidades = rawCantidades ? rawCantidades.split(',') : [];
+            const listaPrecios = rawPrecios ? rawPrecios.split(',') : [];
 
-            // 3. Inyectar datos generales en los elementos HTML
-            document.getElementById('inv-cliente').innerText = proyecto.Cliente || 'N/A';
-            document.getElementById('inv-nombre').innerText = proyecto.Nombre_Proyecto || 'N/A';
-            document.getElementById('inv-fecha').innerText = proyecto.Fecha || 'N/A';
-            document.getElementById('inv-largo').innerText = proyecto.Largo_m || '0.00';
-            document.getElementById('inv-ancho').innerText = proyecto.Ancho_m || '0.00';
-            document.getElementById('inv-area').innerText = proyecto.Area_Total || '0.00';
-            
-            const txtID = proyecto.ID_Proyecto || id;
-            document.getElementById('inv-barcode-id').innerText = txtID;
-            document.getElementById('visual-barcode').innerText = `*${txtID}*`;
-
-            // 4. Inyectar filas de materiales y sumar los costos totales
             const tbody = document.getElementById('materiales-rows');
             tbody.innerHTML = "";
             let sumaTotalAcumulada = 0;
 
-            if (materialesFiltrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: #999;">No hay materiales calculados registrados para este proyecto.</td></tr>`;
+            if (listaServicios.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center" style="color: #999;">No se recibieron materiales en el documento.</td></tr>`;
             } else {
-                materialesFiltrados.forEach(mat => {
+                // Iterar sobre los arreglos para armar dinámicamente las filas
+                listaServicios.forEach((servicio, index) => {
                     const tr = document.createElement('tr');
-                    const nombreMaterial = mat.ID_Material || mat.Material || 'Insumo';
-                    const unidad = mat.Unidad || 'Unidad';
-                    const cantidad = mat.Cantidad_Calculada ? parseFloat(mat.Cantidad_Calculada).toFixed(2) : '0.00';
                     
-                    // Procesar valor numérico para la sumatoria quitando formato de texto si viene de AppSheet
-                    const costoNumerico = mat.Costo_Total ? parseFloat(String(mat.Costo_Total).replace(/[^0-9.-]+/g,"")) : 0;
+                    const nombre = servicio.trim();
+                    const cantidad = listaCantidades[index] ? parseFloat(listaCantidades[index].trim()).toFixed(2) : '0.00';
+                    
+                    // Limpieza rigurosa de caracteres de moneda para asegurar la suma matemática
+                    const precioTexto = listaPrecios[index] ? listaPrecios[index].replace(/[^0-9.-]+/g, "") : "0";
+                    const costoNumerico = parseFloat(precioTexto) || 0;
+                    
                     sumaTotalAcumulada += costoNumerico;
-
                     const costoFormateado = `$${costoNumerico.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
                     tr.innerHTML = `
-                        <td>${nombreMaterial}</td>
-                        <td class="text-center">${unidad}</td>
+                        <td>${nombre}</td>
                         <td class="text-right">${cantidad}</td>
                         <td class="text-right">${costoFormateado}</td>
                     `;
@@ -178,12 +145,18 @@
                 });
             }
 
-            // Inyectar el gran total calculado en la celda del tfoot
+            // 3. Pintar el total final de la cotización
             document.getElementById('inv-total-general').innerText = `$${sumaTotalAcumulada.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
-            // Cambiar visibilidad de la interfaz
+            // Mostrar el contenedor de la factura
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
         } catch (error) {
-            console.error("Error detectado en AppSheet Fetch API:", error);
+            console.error("Error procesando los parámetros de la URL:", error);
+            document.getElementById('loading').innerText = "Error al procesar los datos de facturación.";
+        }
+    }
+</script>
+</body>
+</html>
