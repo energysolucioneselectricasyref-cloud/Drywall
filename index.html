@@ -70,7 +70,8 @@
     </table>
 
     <div class="barcode-section">
-        <div id="barcode-container"></div>
+        // SOLUCIÓN: Se añadió el '$' y se corrigió la URL del generador de códigos de barras (API de tec-it)
+document.getElementById('barcode-container').innerHTML = `<img src="https://tec-it.com{encodeURIComponent(boleta)}&code=Code128&dpi=96&databar=false" class="barcode-img" alt="Barcode">`;
         <div class="barcode-text" id="inv-barcode-id">FAC-001</div>
     </div>
 </div>
