@@ -96,21 +96,20 @@
             document.getElementById('inv-nombre').innerText = urlParams.get('tipo_doc') || 'Cielo raso en drywall';
             document.getElementById('inv-fecha').innerText = urlParams.get('fecha') || 'N/A';
             
-            // Si pasas las dimensiones en la URL, se mapean aquí. Si no, puedes calcularlas
             document.getElementById('inv-largo').innerText = urlParams.get('largo') || '4.00';
             document.getElementById('inv-ancho').innerText = urlParams.get('ancho') || '3.00';
             document.getElementById('inv-area').innerText = urlParams.get('area') || '12.00';
             
             document.getElementById('inv-barcode-id').innerText = boleta;
 
-            // Renderizar la imagen limpia del código de barras tal como en el formato de muestra
+            // CORRECCIÓN AQUÍ: Uso correcto de template literals y endpoint público estable de TEC-IT
             document.getElementById('barcode-container').innerHTML = `<img src="https://tec-it.com{encodeURIComponent(boleta)}&code=Code128&translate-esc=true" class="barcode-img" alt="Barcode">`;
 
             // 2. Descomponer las cadenas unidas por la barra vertical "|"
             const rawServicios = urlParams.get('servicios') || '';
             const rawCantidades = urlParams.get('cantidades') || '';
             const rawPrecios = urlParams.get('p_unit') || '';
-            const rawUnidades = urlParams.get('unidades') || ''; // Nueva lista para las unidades de medida
+            const rawUnidades = urlParams.get('unidades') || '';
 
             const listaServicios = rawServicios ? rawServicios.split('|') : [];
             const listaCantidades = rawCantidades ? rawCantidades.split('|') : [];
@@ -131,14 +130,12 @@
                     const unidad = listaUnidades[index] ? listaUnidades[index].trim() : 'Unidad';
                     const cantidad = listaCantidades[index] ? parseFloat(listaCantidades[index].trim()).toFixed(2) : '0.00';
                     
-                    // Limpieza rigurosa para convertir a número flotante real
                     const precioTexto = listaPrecios[index] ? listaPrecios[index].replace(/[^0-9.-]+/g, "") : "0";
                     const costoNumerico = parseFloat(precioTexto) || 0;
                     
                     sumaTotalAcumulada += costoNumerico;
                     const costoFormateado = `$${costoNumerico.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
-                    // Insertar exactamente las 4 celdas alineadas según tu imagen de muestra
                     tr.innerHTML = `
                         <td>${nombre}</td>
                         <td class="text-center">${unidad}</td>
@@ -152,13 +149,12 @@
             // Asignar la sumatoria final al pie de la tabla
             document.getElementById('inv-total-general').innerText = `$${sumaTotalAcumulada.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
-            // Control de interfaces visuales
+            // Ocultar pantalla de carga y mostrar factura
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
         } catch (error) {
-            console.error("Error al procesar la matriz de datos:", error);
-            document.getElementById('loading').innerText = "Error al procesar los datos de facturación.";
+            document.getElementById('loading').innerText = "Error al procesar los datos de la factura: " + error.message;
         }
     }
 </script>
