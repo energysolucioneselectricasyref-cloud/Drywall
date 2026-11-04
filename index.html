@@ -6,30 +6,27 @@
     <title>Detalle de Materiales - OSUL</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; color: #333; margin: 0; padding: 20px; background-color: #f9f9f9; }
-        .invoice-box { max-width: 500px; margin: auto; padding: 25px; border: 1px solid #ddd; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        .invoice-box { max-width: 600px; margin: auto; padding: 25px; border: 1px solid #ddd; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
         .header-logo { text-align: center; margin-bottom: 25px; }
-        .logo-placeholder { background-color: #000; color: #00e5ff; display: inline-block; padding: 15px 30px; border-radius: 50%; font-weight: bold; border: 3px double #00e5ff; text-shadow: 0 0 5px #00e5ff; box-shadow: inset 0 0 10px rgba(0,229,255,0.5); }
-        .logo-placeholder h2 { margin: 0; font-size: 26px; letter-spacing: 2px; }
-        .logo-placeholder p { margin: 0; font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .logo-img { max-width: 200px; height: auto; display: inline-block; }
         .project-info { font-size: 14px; line-height: 1.6; margin-bottom: 25px; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
         .project-info p { margin: 4px 0; }
-        .section-title { text-align: center; font-size: 16px; font-weight: bold; margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .section-title { text-align: center; font-size: 18px; font-weight: bold; margin: 30px 0 15px 0; letter-spacing: 1px; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; margin-bottom: 25px; }
-        th { background-color: #f4f6f9; padding: 8px; border: 1px solid #ddd; font-weight: bold; text-transform: uppercase; }
-        td { padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
-        tr.total-row td { font-weight: bold; background-color: #f8fafc; font-size: 13px; border-top: 2px solid #333; }
+        th { background-color: #ffffff; padding: 10px; border: 1px solid #333; font-weight: bold; text-align: center; }
+        td { padding: 8px; border: 1px solid #333; vertical-align: middle; }
+        tr.total-row td { font-weight: bold; background-color: #ffffff; font-size: 13px; border-top: 2px solid #333; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .barcode-section { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 5px solid #000; }
-        .barcode { font-family: 'Libre Barcode 39', 'Courier New', monospace; font-size: 42px; margin: 5px 0; display: block; letter-spacing: 2px; }
-        .barcode-text { font-size: 14px; font-weight: bold; letter-spacing: 1px; }
+        .barcode-section { text-align: center; margin-top: 40px; padding-top: 20px; }
+        .barcode-img { max-width: 250px; height: auto; margin: 5px 0; display: inline-block; }
+        .barcode-text { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-top: 5px; }
         .no-print-zone { text-align: center; margin-bottom: 20px; }
-        .btn-print { padding: 10px 20px; background: #000; color: #fff; border: 1px solid #00e5ff; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 5px rgba(0,229,255,0.3); }
+        .btn-print { padding: 10px 20px; background: #000; color: #fff; border: 1px solid #00e5ff; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         .btn-print:hover { background: #00e5ff; color: #000; }
         .loading { text-align: center; font-size: 16px; padding: 50px; color: #666; }
         @media print { body { background-color: #fff; padding: 0; } .invoice-box { box-shadow: none; border: none; padding: 0; max-width: 100%; } .no-print-zone { display: none; } }
     </style>
-    <link href="https://googleapis.com" rel="stylesheet">
 </head>
 <body>
 
@@ -40,49 +37,49 @@
 <div id="loading" class="loading">Cargando datos del documento...</div>
 
 <div id="invoice" class="invoice-box" style="display: none;">
+    <!-- Encabezado con imagen de Logo OSUL -->
     <div class="header-logo">
-        <div class="logo-placeholder">
-            <h2>OSUL</h2>
-            <p>Instalación de Cielo Raso</p>
-        </div>
+        <img src="https://github.io" class="logo-img" alt="OSUL">
     </div>
 
+    <!-- Datos del proyecto e información general -->
     <div class="project-info">
-        <p><strong>• Tipo Documento:</strong> <span id="inv-tipo-doc"></span></p>
         <p><strong>• Cliente:</strong> <span id="inv-cliente"></span></p>
-        <p><strong>• ID Cliente:</strong> <span id="inv-cli-id"></span></p>
+        <p><strong>• Proyecto:</strong> <span id="inv-nombre"></span></p>
         <p><strong>• Fecha:</strong> <span id="inv-fecha"></span></p>
-        <p><strong>• Estado:</strong> <span id="inv-estado"></span></p>
-        <p><strong>• Método de Pago:</strong> <span id="inv-metodo"></span></p>
+        <p><strong>• Dimensiones:</strong> <span id="inv-largo"></span> m × <span id="inv-ancho"></span> m</p>
+        <p><strong>• Área Total:</strong> <span id="inv-area"></span> m²</p>
     </div>
 
     <div class="section-title">Detalle Materiales</div>
 
+    <!-- Tabla Estructurada idéntica a tu diseño de muestra -->
     <table>
         <thead>
             <tr>
-                <th>Material / Servicio</th>
-                <th class="text-right">Cantidad</th>
-                <th class="text-right">Costo Total</th>
+                <th style="width: 45%;">Material</th>
+                <th style="width: 15%;">Unidad</th>
+                <th style="width: 20%;">Cantidad Calculada</th>
+                <th style="width: 20%;">Costo Total</th>
             </tr>
         </thead>
         <tbody id="materiales-rows"></tbody>
         <tfoot>
             <tr class="total-row">
-                <td colspan="2" class="text-right">TOTAL:</td>
+                <td colspan="3" class="text-right">TOTAL:</td>
                 <td id="inv-total-general" class="text-right">$0.00</td>
             </tr>
         </tfoot>
     </table>
 
+    <!-- Código de Barras dinámico en formato de Imagen limpia -->
     <div class="barcode-section">
-        <span class="barcode" id="visual-barcode"></span>
+        <div id="barcode-container"></div>
         <div class="barcode-text" id="inv-barcode-id">FAC-001</div>
     </div>
 </div>
 
 <script>
-    // Captura los parámetros de la URL enviados desde AppSheet
     const urlParams = new URLSearchParams(window.location.search);
     const boleta = urlParams.get('boleta');
 
@@ -94,50 +91,57 @@
 
     function generarFacturaDirecta() {
         try {
-            // 1. Extraer los datos generales de la URL
-            document.getElementById('inv-tipo-doc').innerText = urlParams.get('tipo_doc') || 'Cotización';
+            // 1. Cargar metadatos generales
             document.getElementById('inv-cliente').innerText = urlParams.get('mesa') || 'N/A';
-            document.getElementById('inv-cli-id').innerText = urlParams.get('cli_id') || 'N/A';
+            document.getElementById('inv-nombre').innerText = urlParams.get('tipo_doc') || 'Cielo raso en drywall';
             document.getElementById('inv-fecha').innerText = urlParams.get('fecha') || 'N/A';
-            document.getElementById('inv-estado').innerText = urlParams.get('estado') || 'N/A';
-            document.getElementById('inv-metodo').innerText = urlParams.get('metodo_pago') || 'N/A';
+            
+            // Si pasas las dimensiones en la URL, se mapean aquí. Si no, puedes calcularlas
+            document.getElementById('inv-largo').innerText = urlParams.get('largo') || '4.00';
+            document.getElementById('inv-ancho').innerText = urlParams.get('ancho') || '3.00';
+            document.getElementById('inv-area').innerText = urlParams.get('area') || '12.00';
             
             document.getElementById('inv-barcode-id').innerText = boleta;
-            document.getElementById('visual-barcode').innerText = `*${boleta}*`;
 
-            // 2. Procesar y descomponer las listas separadas por comas (, )
+            // Renderizar la imagen limpia del código de barras tal como en el formato de muestra
+            document.getElementById('barcode-container').innerHTML = `<img src="https://tec-it.com{encodeURIComponent(boleta)}&code=Code128&translate-esc=true" class="barcode-img" alt="Barcode">`;
+
+            // 2. Descomponer las cadenas unidas por la barra vertical "|"
             const rawServicios = urlParams.get('servicios') || '';
             const rawCantidades = urlParams.get('cantidades') || '';
             const rawPrecios = urlParams.get('p_unit') || '';
+            const rawUnidades = urlParams.get('unidades') || ''; // Nueva lista para las unidades de medida
 
-            // Convertir cadenas de texto en arreglos limpios independientes
-            const listaServicios = rawServicios ? rawServicios.split(',') : [];
-            const listaCantidades = rawCantidades ? rawCantidades.split(',') : [];
-            const listaPrecios = rawPrecios ? rawPrecios.split(',') : [];
+            const listaServicios = rawServicios ? rawServicios.split('|') : [];
+            const listaCantidades = rawCantidades ? rawCantidades.split('|') : [];
+            const listaPrecios = rawPrecios ? rawPrecios.split('|') : [];
+            const listaUnidades = rawUnidades ? rawUnidades.split('|') : [];
 
             const tbody = document.getElementById('materiales-rows');
             tbody.innerHTML = "";
             let sumaTotalAcumulada = 0;
 
             if (listaServicios.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center" style="color: #999;">No se recibieron materiales en el documento.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="color: #999;">No se recibieron materiales en el documento.</td></tr>`;
             } else {
-                // Iterar sobre los arreglos para armar dinámicamente las filas
                 listaServicios.forEach((servicio, index) => {
                     const tr = document.createElement('tr');
                     
                     const nombre = servicio.trim();
+                    const unidad = listaUnidades[index] ? listaUnidades[index].trim() : 'Unidad';
                     const cantidad = listaCantidades[index] ? parseFloat(listaCantidades[index].trim()).toFixed(2) : '0.00';
                     
-                    // Limpieza rigurosa de caracteres de moneda para asegurar la suma matemática
+                    // Limpieza rigurosa para convertir a número flotante real
                     const precioTexto = listaPrecios[index] ? listaPrecios[index].replace(/[^0-9.-]+/g, "") : "0";
                     const costoNumerico = parseFloat(precioTexto) || 0;
                     
                     sumaTotalAcumulada += costoNumerico;
                     const costoFormateado = `$${costoNumerico.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
+                    // Insertar exactamente las 4 celdas alineadas según tu imagen de muestra
                     tr.innerHTML = `
                         <td>${nombre}</td>
+                        <td class="text-center">${unidad}</td>
                         <td class="text-right">${cantidad}</td>
                         <td class="text-right">${costoFormateado}</td>
                     `;
@@ -145,15 +149,15 @@
                 });
             }
 
-            // 3. Pintar el total final de la cotización
+            // Asignar la sumatoria final al pie de la tabla
             document.getElementById('inv-total-general').innerText = `$${sumaTotalAcumulada.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
-            // Mostrar el contenedor de la factura
+            // Control de interfaces visuales
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
         } catch (error) {
-            console.error("Error procesando los parámetros de la URL:", error);
+            console.error("Error al procesar la matriz de datos:", error);
             document.getElementById('loading').innerText = "Error al procesar los datos de facturación.";
         }
     }
