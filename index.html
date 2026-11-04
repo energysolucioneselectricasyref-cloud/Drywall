@@ -70,18 +70,19 @@
     </table>
 
     <div class="barcode-section">
-        // SOLUCIÓN: Se añadió el '$' y se corrigió la URL del generador de códigos de barras (API de tec-it)
-document.getElementById('barcode-container').innerHTML = `<img src="https://tec-it.com{encodeURIComponent(boleta)}&code=Code128&dpi=96&databar=false" class="barcode-img" alt="Barcode">`;
-        <div class="barcode-text" id="inv-barcode-id">FAC-001</div>
+        <!-- CONTENEDOR REPARADO -->
+        <div id="barcode-container"></div>
+        <div class="barcode-text" id="inv-barcode-id"></div>
     </div>
 </div>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const boleta = urlParams.get('boleta');
+    // BUSCADOR INTELIGENTE: Si AppSheet envía 'boleta' o 'barcode', cualquiera funciona
+    const boleta = urlParams.get('boleta') || urlParams.get('barcode');
 
     if (!boleta) {
-        document.getElementById('loading').innerText = "Error: Parámetro 'boleta' (ID de proyecto) no detectado en la URL.";
+        document.getElementById('loading').innerText = "Error: Parámetro de código (boleta/barcode) no detectado en la URL.";
     } else {
         generarFacturaDirecta();
     }
@@ -98,8 +99,8 @@ document.getElementById('barcode-container').innerHTML = `<img src="https://tec-
             
             document.getElementById('inv-barcode-id').innerText = boleta;
 
-            // SOLUCIÓN AQUÍ: Se agregó el '$' omitido antes de las llaves y se estructuró correctamente la API pública de tec-it
-            document.getElementById('barcode-container').innerHTML = `<img src="https://tec-it.com{encodeURIComponent(boleta)}&code=Code128" class="barcode-img" alt="Barcode">`;
+            // URL ESTRUCTURADA CORRECTAMENTE CON EL OPERADOR INTERPOLADOR $ Y LA API DE TEC-IT
+            document.getElementById('barcode-container').innerHTML = `<img src="https://tec-it.com{encodeURIComponent(boleta)}&code=Code128&dpi=96&databar=false" class="barcode-img" alt="Barcode">`;
 
             const rawServicios = urlParams.get('servicios') || '';
             const rawCantidades = urlParams.get('cantidades') || '';
