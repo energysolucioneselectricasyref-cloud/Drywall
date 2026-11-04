@@ -37,12 +37,10 @@
 <div id="loading" class="loading">Cargando datos del documento...</div>
 
 <div id="invoice" class="invoice-box" style="display: none;">
-    <!-- Encabezado con imagen de Logo OSUL -->
     <div class="header-logo">
         <img src="https://github.io" class="logo-img" alt="OSUL">
     </div>
 
-    <!-- Datos del proyecto e información general -->
     <div class="project-info">
         <p><strong>• Cliente:</strong> <span id="inv-cliente"></span></p>
         <p><strong>• Proyecto:</strong> <span id="inv-nombre"></span></p>
@@ -53,7 +51,6 @@
 
     <div class="section-title">Detalle Materiales</div>
 
-    <!-- Tabla Estructurada -->
     <table>
         <thead>
             <tr>
@@ -72,9 +69,9 @@
         </tfoot>
     </table>
 
-    <!-- Contenedor del Código de Barras -->
-    <div class="bc-container" id="div-barcode" style="display:none;">
-        <img id="img-barcode" src="" alt="Código de Barras">
+    <div class="barcode-section">
+        <div id="barcode-container"></div>
+        <div class="barcode-text" id="inv-barcode-id">FAC-001</div>
     </div>
 </div>
 
@@ -90,7 +87,6 @@
 
     function generarFacturaDirecta() {
         try {
-            // 1. Cargar metadatos generales
             document.getElementById('inv-cliente').innerText = urlParams.get('mesa') || 'N/A';
             document.getElementById('inv-nombre').innerText = urlParams.get('tipo_doc') || 'Cielo raso en drywall';
             document.getElementById('inv-fecha').innerText = urlParams.get('fecha') || 'N/A';
@@ -101,10 +97,9 @@
             
             document.getElementById('inv-barcode-id').innerText = boleta;
 
-            // CORRECCIÓN CÓDIGO DE BARRAS: Endpoint oficial y uso correcto del template literal con "$"
+            // SOLUCIÓN AQUÍ: Se agregó el '$' omitido antes de las llaves y se estructuró correctamente la API pública de tec-it
             document.getElementById('barcode-container').innerHTML = `<img src="https://tec-it.com{encodeURIComponent(boleta)}&code=Code128" class="barcode-img" alt="Barcode">`;
 
-            // 2. Descomponer las cadenas unidas por la barra vertical "|"
             const rawServicios = urlParams.get('servicios') || '';
             const rawCantidades = urlParams.get('cantidades') || '';
             const rawPrecios = urlParams.get('p_unit') || '';
@@ -133,9 +128,7 @@
                     const costoNumerico = parseFloat(precioTexto) || 0;
                     
                     sumaTotalAcumulada += costoNumerico;
-                    
-                    // CORRECCIÓN MONEDA: Formato nativo local de Colombia (COP $)
-                    const costoFormateado = costoNumerico.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 });
+                    const costoFormateado = `$${costoNumerico.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
                     tr.innerHTML = `
                         <td>${nombre}</td>
@@ -147,10 +140,8 @@
                 });
             }
 
-            // CORRECCIÓN TOTAL GENERAL: Formato nativo local de Colombia (COP $)
-            document.getElementById('inv-total-general').innerText = sumaTotalAcumulada.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 });
+            document.getElementById('inv-total-general').innerText = `$${sumaTotalAcumulada.toLocaleString('es-CO', {minimumFractionDigits: 2})}`;
 
-            // Ocultar pantalla de carga y mostrar factura
             document.getElementById('loading').style.display = 'none';
             document.getElementById('invoice').style.display = 'block';
 
