@@ -14,7 +14,7 @@
             text-align: center;
             border-bottom: 2px solid #2b579a;
             padding-bottom: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .header h1 {
             margin: 0;
@@ -27,8 +27,8 @@
             margin-bottom: 30px;
         }
         .project-info td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
+            padding: 6px 8px;
+            border-bottom: 1px solid #eee;
         }
         .project-info td.label {
             font-weight: bold;
@@ -38,17 +38,41 @@
         .project-info td.value {
             width: 70%;
         }
+        
+        /* Estilos para la tabla de materiales */
+        .materials-title {
+            color: #2b579a;
+            border-bottom: 1px solid #2b579a;
+            padding-bottom: 5px;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .materials-table th {
+            background-color: #f4f4f4;
+            color: #333;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .materials-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
         .image-container {
             text-align: center;
-            margin-top: 20px;
-        }
-        .barcode-img {
-            max-width: 250px;
-            height: auto;
+            margin-top: 30px;
+            page-break-inside: avoid;
         }
         @media print {
             body { margin: 0; }
-            .no-print { display: none; }
         }
     </style>
 </head>
@@ -59,44 +83,69 @@
         <p>Calculadora 9.0 Drywall</p>
     </div>
 
+    <!-- Información General del Proyecto -->
     <table class="project-info">
         <tr>
             <td class="label">ID de Proyecto:</td>
-            <td class="value"><span class="notranslate"><span class="notranslate">&lt;&lt;[ID_Proyecto]&gt;&gt;</span></span></td>
+            <td class="value"><span class="notranslate">&lt;&lt;[ID_Proyecto]&gt;&gt;</span></td>
         </tr>
         <tr>
             <td class="label">Nombre del Proyecto:</td>
-            <td class="value"><span class="notranslate"><span class="notranslate">&lt;&lt;[Nombre_Proyecto]&gt;&gt;</span></span></td>
+            <td class="value"><span class="notranslate">&lt;&lt;[Nombre_Proyecto]&gt;&gt;</span></td>
         </tr>
         <tr>
             <td class="label">Cliente:</td>
-            <td class="value"><span class="notranslate"><span class="notranslate">&lt;&lt;[Cliente]&gt;&gt;</span></span></td>
+            <td class="value"><span class="notranslate">&lt;&lt;[Cliente]&gt;&gt;</span></td>
         </tr>
         <tr>
             <td class="label">Fecha:</td>
-            <td class="value"><span class="notranslate"><span class="notranslate">&lt;&lt;[Fecha]&gt;&gt;</span></span></td>
+            <td class="value"><span class="notranslate">&lt;&lt;[Fecha]&gt;&gt;</span></td>
         </tr>
         <tr>
             <td class="label">Largo (m):</td>
-            <td class="value"><span class="notranslate"><span class="notranslate">&lt;&lt;[Largo_m]&gt;&gt;</span></span> m</td>
+            <td class="value"><span class="notranslate">&lt;&lt;[Largo_m]&gt;&gt;</span> m</td>
         </tr>
         <tr>
             <td class="label">Ancho (m):</td>
-            <td class="value"><span class="notranslate"><span class="notranslate">&lt;&lt;[Ancho_m]&gt;&gt;</span></span> m</td>
+            <td class="value"><span class="notranslate">&lt;&lt;[Ancho_m]&gt;&gt;</span> m</td>
         </tr>
         <tr>
             <td class="label">Porcentaje Desperdicio:</td>
-            <td class="value"><span class="notranslate"><span class="notranslate">&lt;&lt;[Porcentaje_Desperdicio]&gt;&gt;</span></span>%</td>
+            <td class="value"><span class="notranslate">&lt;&lt;[Porcentaje_Desperdicio]&gt;&gt;</span>%</td>
         </tr>
         <tr>
             <td class="label">Área Total:</td>
-            <td class="value"><strong><span class="notranslate"><span class="notranslate">&lt;&lt;[Area_Total]&gt;&gt;</span></span> m²</strong></td>
+            <td class="value"><strong><span class="notranslate">&lt;&lt;[Area_Total]&gt;&gt;</span> m²</strong></td>
         </tr>
     </table>
 
+    <!-- Tabla Detalle de Materiales Relacionados -->
+    <h2 class="materials-title">Detalle de Materiales</h2>
+    <table class="materials-table">
+        <thead>
+            <tr>
+                <th>Material</th>
+                <th>Cantidad Calculada</th>
+                <th>Unidad</th>
+                <th>Costo Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <span class="notranslate">&lt;&lt;Start:[Related Detalle_Materiales]&gt;&gt;</span>
+            <tr>
+                <td><span class="notranslate">&lt;&lt;[Nombre_Material_VC]&gt;&gt;</span></td>
+                <td><span class="notranslate">&lt;&lt;[Cantidad_Calculado]&gt;&gt;</span></td>
+                <td><span class="notranslate">&lt;&lt;[Unidad_Medida_VC]&gt;&gt;</span></td>
+                <td><span class="notranslate">&lt;&lt;[Costo_Total]&gt;&gt;</span></td>
+            </tr>
+            <span class="notranslate">&lt;&lt;End&gt;&gt;</span>
+        </tbody>
+    </table>
+
+    <!-- Código de Barras -->
     <div class="image-container">
         <h3>Código de Barras / Imagen Asociada</h3>
-        <p><span class="notranslate"><span class="notranslate">&lt;&lt;[Imagen_Codigo_Barras]&gt;&gt;</span></span></p>
+        <p><span class="notranslate">&lt;&lt;[Imagen_Codigo_Barras]&gt;&gt;</span></p>
     </div>
 
 </body>
