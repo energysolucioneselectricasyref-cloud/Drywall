@@ -89,6 +89,19 @@
       background-color: #e67e22;
       color: #ffffff;
     }
+    .barcode-box {
+      display: inline-block;
+      text-align: center;
+      margin-top: 5px;
+    }
+    .barcode-text {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      margin-top: 2px;
+      color: #000000;
+    }
     .footer {
       margin-top: 35px;
       text-align: center;
@@ -177,9 +190,7 @@
     <table width="100%">
       <tr>
         <td width="50%" valign="top">
-          <div id="barcode-container" style="margin-top: 5px;">
-            <img id="barcode-img" alt="Código de Barras" style="max-width: 180px; height: auto; display: none;">
-          </div>
+          <div id="barcode-container" class="barcode-box"></div>
         </td>
         <td width="50%" valign="top">
           <table class="totals-table">
@@ -217,15 +228,55 @@
     document.getElementById('cli_tel').textContent = params.get('cli_tel') || '-';
     document.getElementById('direccion').textContent = params.get('direccion') || '-';
 
-    // Generar código de barras mediante imagen directa (si no viene 'barcode', usa 'boleta')
-    const barcodeValue = params.get('barcode') || params.get('boleta');
-    const barcodeImg = document.getElementById('barcode-img');
-    if (barcodeValue && barcodeValue.trim() !== '') {
-      barcodeImg.src = `https://tec-it.com{encodeURIComponent(barcodeValue.trim())}&code=Code128&translate-esc=on`;
-      barcodeImg.style.display = 'block';
+    // Generador local de Código de Barras Code 39 (100% offline, sin APIs externas)
+    function dibujarCodigoBarras(texto) {
+      if (!texto) return;
+      const limpio = '*' + texto.toUpperCase().replace(/[^0-9A-Z\-\.\ \$\/\+\%]/g, '') + '*';
+      const tablaCode39 = {
+        '0':'nnnwwnwnn','1':'wnnwnnnnw','2':'nnwwnnnnw','3':'wnwwnnnnn','4':'nnnwwnnnw',
+        '5':'wnnwwnnnn','6':'nnwwwnnnn','7':'nnnwnnwnw','8':'wnnwnnwnn','9':'nnwwnnwnn',
+        'A':'wnnnnwnnw','B':'nnwnnwnnw','C':'wnwnnwnnn','D':'nnnnwwnnw','E':'wnnnwwnnn',
+        'F':'nnwnwwnnn','G':'nnnnnwwnw','H':'wnnnnwwnn','I':'nnwnnwwnn','J':'nnnnwwwnn',
+        'K':'wnnnnnnww','L':'nnwnnnnww','M':'wnwnnnnwn','N':'nnnnwnnww','O':'wnnnwnnwn',
+        'P':'nnwnwnnwn','Q':'nnnnnnwww','R':'wnnnnnwwn','S':'nnwnnnwwn','T':'nnnnwnwwn',
+        'U':'wwnnnnnnw','V':'nwwnnnnnw','W':'wwwnnnnnn','X':'nwnnwnnnw','Y':'wwnnwnnnn',
+        'Z':'nwwnwnnnn','-':'nwnnnnwnw','.':'wwnnnnwnn',' ':'nwwnnnwnn','$':'nwnwnwnnn',
+        '/':'nwnwnnnwn','+':'nwnnnwnwn','%':'nnnwnwnwn','*':'nwnnwnwnn'
+      };
+
+      let x = 0;
+      const anchoFino = 1.6;
+      const anchoGrueso = 3.8;
+      const alto = 45;
+      let rects = '';
+
+      for (let i = 0; i < limpio.length; i++) {
+        const patron = tablaCode39[limpio[i]];
+        if (!patron) continue;
+        for (let j = 0; j < 9; j++) {
+          const w = (patron[j] === 'w') ? anchoGrueso : anchoFino;
+          if (j % 2 === 0) {
+            rects += `<rect x="${x}" y="0" width="${w}" height="${alto}" fill="#000000"/>`;
+          }
+          x += w;
+        }
+        x += anchoFino;
+      }
+
+      const container = document.getElementById('barcode-container');
+      container.innerHTML = `
+        <svg width="${x}" height="${alto}" viewBox="0 0 ${x} ${alto}" xmlns="http://w3.org">
+          ${rects}
+        </svg>
+        <div class="barcode-text">${texto.toUpperCase()}</div>
+      `;
     }
 
-    // Separar listas usando "|" (o "," solo si no hay "|")
+    const barcodeValue = params.get('barcode') || params.get('boleta');
+    if (barcodeValue && barcodeValue.trim() !== '') {
+      dibujarCodigoBarras(barcodeValue.trim());
+    }
+
     function separarLista(texto) {
       if (!texto || texto.trim() === '') return [];
       if (texto.includes('|')) {
@@ -234,7 +285,6 @@
       return texto.split(',').map(item => item.trim());
     }
 
-    // Convertir texto numérico de AppSheet a número real
     function limpiarNumero(texto) {
       if (!texto) return 0;
       let limpio = texto.replace(/\$/g, '').trim();
@@ -262,26 +312,3 @@
     });
 
     const totalFilas = Math.max(servicios.length, cantidades.length, costos.length);
-
-    for (let i = 0; i < totalFilas; i++) {
-      const valorNumerico = limpiarNumero(costos[i]);
-      sumaTotal += valorNumerico;
-
-      const cantNumerica = parseFloat((cantidades[i] || '0').replace(/,/g, '.')) || 0;
-
-      const fila = document.createElement('tr');
-      fila.innerHTML = `
-        <td>${servicios[i] || 'Ítem ' + (i + 1)}</td>
-        <td class="text-center">${unidades[i] || 'Und'}</td>
-        <td class="text-center">${cantNumerica}</td>
-        <td class="text-right">${formatoMoneda.format(valorNumerico)}</td>
-      `;
-      tbody.appendChild(fila);
-    }
-
-    document.getElementById('subtotal-general').textContent = formatoMoneda.format(sumaTotal);
-    document.getElementById('total-general').textContent = formatoMoneda.format(sumaTotal);
-  </script>
-
-</body>
-</html>
