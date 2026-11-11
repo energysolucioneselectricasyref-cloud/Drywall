@@ -1,149 +1,179 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Reporte de Proyecto</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-            margin: 20px;
-            line-height: 1.6;
-        }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #2b579a;
-            padding-bottom: 10px;
-            margin-bottom: 25px;
-        }
-        .header h1 {
-            margin: 0;
-            color: #2b579a;
-            font-size: 24px;
-        }
-        .project-info {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        .project-info td {
-            padding: 6px 8px;
-            border-bottom: 1px solid #eee;
-        }
-        .project-info td.label {
-            font-weight: bold;
-            color: #555;
-            width: 30%;
-        }
-        .project-info td.value {
-            width: 70%;
-        }
-        
-        .materials-title {
-            color: #2b579a;
-            border-bottom: 1px solid #2b579a;
-            padding-bottom: 5px;
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        .materials-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .materials-table th {
-            background-color: #f4f4f4;
-            color: #333;
-            font-weight: bold;
-            text-align: left;
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        .materials-table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        
-        .image-container {
-            text-align: center;
-            margin-top: 30px;
-            page-break-inside: avoid;
-        }
-        @media print {
-            body { margin: 0; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #333333;
+      margin: 0;
+      padding: 25px;
+      font-size: 13px;
+    }
+    .header {
+      width: 100%;
+      border-bottom: 2px solid #2c3e50;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+    .header td {
+      vertical-align: top;
+    }
+    .company-name {
+      font-size: 22px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin: 0;
+    }
+    .invoice-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #e74c3c;
+      text-align: right;
+      margin: 0;
+    }
+    .info-table {
+      width: 100%;
+      margin-bottom: 25px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 12px;
+    }
+    .info-table td {
+      padding: 5px 8px;
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 25px;
+    }
+    .items-table th {
+      background-color: #2c3e50;
+      color: #ffffff;
+      text-align: left;
+      padding: 10px;
+      font-weight: bold;
+    }
+    .items-table td {
+      border-bottom: 1px solid #dddddd;
+      padding: 10px;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .totals-table {
+      width: 45%;
+      margin-left: auto;
+      border-collapse: collapse;
+    }
+    .totals-table td {
+      padding: 8px;
+      border-bottom: 1px solid #eeeeee;
+    }
+    .total-final {
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #2c3e50;
+      color: #ffffff;
+    }
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 11px;
+      color: #777777;
+      border-top: 1px solid #dddddd;
+      padding-top: 15px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Reporte Detallado de Proyecto</h1>
-        <p>Calculadora 9.0 Drywall</p>
-    </div>
+  <!-- ENCABEZADO -->
+  <table class="header">
+    <tr>
+      <td>
+        <p class="company-name">CALCULADORA DRYWALL</p>
+        <p>Presupuesto y Detalle de Materiales<br>NIT / RUT: 000.000.000-0</p>
+      </td>
+      <td class="text-right">
+        <p class="invoice-title">FACTURA / COTIZACIÓN</p>
+        <p>
+          <strong>N° Proyecto:</strong> <<[ID_Proyecto]>><br>
+          <strong>Fecha:</strong> <<[Fecha]>>
+        </p>
+      </td>
+    </tr>
+  </table>
 
-    <!-- Información General del Proyecto -->
-    <table class="project-info">
-        <tr>
-            <td class="label">ID de Proyecto:</td>
-            <td class="value"><span class="notranslate">&lt;&lt;[ID_Proyecto]&gt;&gt;</span></td>
-        </tr>
-        <tr>
-            <td class="label">Nombre del Proyecto:</td>
-            <td class="value"><span class="notranslate">&lt;&lt;[Nombre_Proyecto]&gt;&gt;</span></td>
-        </tr>
-        <tr>
-            <td class="label">Cliente:</td>
-            <td class="value"><span class="notranslate">&lt;&lt;[Cliente]&gt;&gt;</span></td>
-        </tr>
-        <tr>
-            <td class="label">Fecha:</td>
-            <td class="value"><span class="notranslate">&lt;&lt;[Fecha]&gt;&gt;</span></td>
-        </tr>
-        <tr>
-            <td class="label">Largo (m):</td>
-            <td class="value"><span class="notranslate">&lt;&lt;[Largo_m]&gt;&gt;</span> m</td>
-        </tr>
-        <tr>
-            <td class="label">Ancho (m):</td>
-            <td class="value"><span class="notranslate">&lt;&lt;[Ancho_m]&gt;&gt;</span> m</td>
-        </tr>
-        <tr>
-            <td class="label">Porcentaje Desperdicio:</td>
-            <td class="value"><span class="notranslate">&lt;&lt;[Porcentaje_Desperdicio]&gt;&gt;</span>%</td>
-        </tr>
-        <tr>
-            <td class="label">Área Total:</td>
-            <td class="value"><strong><span class="notranslate">&lt;&lt;[Area_Total]&gt;&gt;</span> m²</strong></td>
-        </tr>
-    </table>
+  <!-- DATOS DEL CLIENTE Y PROYECTO -->
+  <table class="info-table">
+    <tr>
+      <td width="50%">
+        <strong>Cliente:</strong> <<[Cliente].[Nombre]>><br>
+        <strong>Proyecto:</strong> <<[Nombre_Proyecto]>>
+      </td>
+      <td width="50%">
+        <strong>Medidas:</strong> <<[Largo_m]>> m x <<[Ancho_m]>> m<br>
+        <strong>Área Total:</strong> <<[Area_Total]>> m² (Desperdicio: <<[Porcentaje_Desperdicio]>>%)
+      </td>
+    </tr>
+  </table>
 
-    <!-- Tabla Detalle de Materiales Corregida -->
-    <h2 class="materials-title">Detalle de Materiales</h2>
-    <table class="materials-table">
-        <thead>
-            <tr>
-                <th>Material</th>
-                <th>Cantidad Calculada</th>
-                <th>Unidad</th>
-                <th>Costo Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><span class="notranslate">&lt;&lt;Start:[Related Detalle_Materiales]&gt;&gt;</span><span class="notranslate">&lt;&lt;[Nombre_Material_VC]&gt;&gt;</span></td>
-                <td><span class="notranslate">&lt;&lt;[Cantidad_Calculado]&gt;&gt;</span></td>
-                <td><span class="notranslate">&lt;&lt;[Unidad_Medida_VC]&gt;&gt;</span></td>
-                <td><span class="notranslate">&lt;&lt;[Costo_Total]&gt;&gt;</span><span class="notranslate">&lt;&lt;End&gt;&gt;</span></td>
-            </tr>
-        </tbody>
-    </table>
+  <!-- TABLA DE MATERIALES (RELACIONADA) -->
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th>Material / Descripción</th>
+        <th class="text-center">Cantidad</th>
+        <th class="text-right">Precio Unit.</th>
+        <th class="text-right">Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- INICIO DEL CICLO DE MATERIALES -->
+      <<Start: [Related Detalle_Materiales]>>
+      <tr>
+        <td><<[Material]>></td>
+        <td class="text-center"><<[Cantidad]>></td>
+        <td class="text-right"><<[Precio_Unitario]>></td>
+        <td class="text-right"><<[Subtotal]>></td>
+      </tr>
+      <<End>>
+      <!-- FIN DEL CICLO -->
+    </tbody>
+  </table>
 
-    <!-- Código de Barras / Imagen o Enlace -->
-    <div class="image-container">
-        <h3>Código de Barras / Imagen Asociada</h3>
-        <p><span class="notranslate">&lt;&lt;[Imagen_Codigo_Barras]&gt;&gt;</span></p>
-    </div>
+  <!-- TOTALES Y CÓDIGO DE BARRAS -->
+  <table width="100%">
+    <tr>
+      <td width="50%" valign="top">
+        <!-- Muestra la imagen del código de barras de tu tabla -->
+        <p><strong>Código de Control:</strong></p>
+        <img src="<<[Imagen_Codigo_Barra]>>" width="160" alt="Código de Barras">
+      </td>
+      <td width="50%" valign="top">
+        <table class="totals-table">
+          <tr>
+            <td><strong>Subtotal:</strong></td>
+            <td class="text-right"><<SUM([Related Detalle_Materiales][Subtotal])>></td>
+          </tr>
+          <tr class="total-final">
+            <td>TOTAL A PAGAR:</td>
+            <td class="text-right"><<SUM([Related Detalle_Materiales][Subtotal])>></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- PIE DE PÁGINA -->
+  <div class="footer">
+    Gracias por confiar en nosotros para su proyecto de Drywall.<br>
+    Documento generado automáticamente.
+  </div>
 
 </body>
 </html>
