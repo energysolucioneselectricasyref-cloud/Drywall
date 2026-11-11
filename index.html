@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factura / Cotización - Drywall</title>
+  <title>Factura / Cotización - Energy Soluciones</title>
   <script src="https://jsdelivr.net"></script>
   <style>
     body {
@@ -13,17 +13,6 @@
       padding: 20px;
       font-size: 13px;
       background-color: #f4f4f4;
-    }
-    .debug-box {
-      max-width: 800px;
-      margin: 0 auto 15px auto;
-      background: #fff3cd;
-      border: 1px solid #ffeeba;
-      color: #856404;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 11px;
-      word-break: break-all;
     }
     .invoice-box {
       max-width: 800px;
@@ -35,23 +24,29 @@
     }
     .header {
       width: 100%;
-      border-bottom: 2px solid #2c3e50;
+      border-bottom: 2px solid #e67e22;
       padding-bottom: 15px;
       margin-bottom: 20px;
     }
     .header td { vertical-align: top; }
     .company-name {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
       color: #2c3e50;
+      margin: 0 0 5px 0;
+    }
+    .company-details {
+      font-size: 12px;
+      color: #555555;
       margin: 0;
+      line-height: 1.4;
     }
     .invoice-title {
       font-size: 20px;
       font-weight: bold;
-      color: #e74c3c;
+      color: #e67e22;
       text-align: right;
-      margin: 0;
+      margin: 0 0 5px 0;
       text-transform: uppercase;
     }
     .info-table {
@@ -92,7 +87,7 @@
     .total-final {
       font-size: 16px;
       font-weight: bold;
-      background-color: #2c3e50;
+      background-color: #e67e22;
       color: #ffffff;
     }
     .footer {
@@ -105,7 +100,7 @@
     }
     .btn-print {
       display: block;
-      width: 180px;
+      width: 200px;
       margin: 0 auto 20px auto;
       padding: 10px;
       background-color: #27ae60;
@@ -120,25 +115,27 @@
     @media print {
       body { background-color: #ffffff; padding: 0; }
       .invoice-box { box-shadow: none; padding: 0; max-width: 100%; }
-      .btn-print, .debug-box { display: none; }
+      .btn-print { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- CUADRO DE DIAGNÓSTICO TEMPORAL -->
-  <div class="debug-box" id="debug-info">Cargando datos de URL...</div>
-
   <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 
   <div class="invoice-box">
+    <!-- ENCABEZADO -->
     <table class="header">
       <tr>
-        <td>
-          <p class="company-name">ENERGY SOLUCIONES ELÉCTRICAS Y REF.</p>
-          <p>Presupuesto y Detalle de Materiales Drywall</p>
+        <td width="60%">
+          <p class="company-name">ENERGY SOLUCIONES ELÉCTRICAS Y REFRIGERACIÓN</p>
+          <p class="company-details">
+            Carrera 47 #13-48 E2 Barrio San José, Tierralta - Córdoba<br>
+            Tel: 324 243 2439<br>
+            Presupuesto y Detalle de Materiales Drywall
+          </p>
         </td>
-        <td class="text-right">
+        <td width="40%" class="text-right">
           <p class="invoice-title" id="tipo_doc">COTIZACIÓN</p>
           <p>
             <strong>N° Documento:</strong> <span id="boleta">-</span><br>
@@ -149,6 +146,7 @@
       </tr>
     </table>
 
+    <!-- DATOS DEL CLIENTE -->
     <table class="info-table">
       <tr>
         <td width="55%">
@@ -163,6 +161,7 @@
       </tr>
     </table>
 
+    <!-- TABLA DE MATERIALES -->
     <table class="items-table">
       <thead>
         <tr>
@@ -175,6 +174,7 @@
       <tbody id="tabla-materiales"></tbody>
     </table>
 
+    <!-- TOTALES Y CÓDIGO DE BARRAS -->
     <table width="100%">
       <tr>
         <td width="50%" valign="top">
@@ -184,33 +184,26 @@
           <table class="totals-table">
             <tr>
               <td><strong>Subtotal:</strong></td>
-              <td class="text-right" id="subtotal-general">$0</td>
+              <td class="text-right" id="subtotal-general">$ 0</td>
             </tr>
             <tr class="total-final">
               <td>TOTAL A PAGAR:</td>
-              <td class="text-right" id="total-general">$0</td>
+              <td class="text-right" id="total-general">$ 0</td>
             </tr>
           </table>
         </td>
       </tr>
     </table>
 
+    <!-- PIE DE PÁGINA -->
     <div class="footer">
-      Gracias por confiar en nosotros para su proyecto.<br>
+      Gracias por confiar en Energy Soluciones Eléctricas y Refrigeración.<br>
       Documento generado desde AppSheet.
     </div>
   </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
-
-    // Mostrar qué llegó exactamente en los parámetros de materiales
-    document.getElementById('debug-info').innerHTML = 
-      `<strong>Diagnóstico URL:</strong><br>` +
-      `servicios = "${params.get('servicios') || 'VACÍO'}"<br>` +
-      `cantidades = "${params.get('cantidades') || 'VACÍO'}"<br>` +
-      `p_unit = "${params.get('p_unit') || 'VACÍO'}"<br>` +
-      `unidades = "${params.get('unidades') || 'VACÍO'}"`;
 
     document.getElementById('tipo_doc').textContent = params.get('tipo_doc') || 'COTIZACIÓN';
     document.getElementById('boleta').textContent = params.get('boleta') || 'N/A';
@@ -223,6 +216,7 @@
     document.getElementById('cli_tel').textContent = params.get('cli_tel') || '-';
     document.getElementById('direccion').textContent = params.get('direccion') || '-';
 
+    // Generar código de barras
     const barcodeValue = params.get('barcode');
     if (barcodeValue && typeof JsBarcode !== 'undefined') {
       try {
@@ -236,10 +230,29 @@
       } catch (e) {}
     }
 
+    // Separar listas usando "|" (o "," solo si no hay "|")
     function separarLista(texto) {
       if (!texto || texto.trim() === '') return [];
-      if (texto.includes('|')) return texto.split('|').map(item => item.trim());
+      if (texto.includes('|')) {
+        return texto.split('|').map(item => item.trim());
+      }
       return texto.split(',').map(item => item.trim());
+    }
+
+    // Convertir texto numérico de AppSheet (ej. "$8,100.00" o "240000.00") a número real
+    function limpiarNumero(texto) {
+      if (!texto) return 0;
+      // Quita símbolo $ y espacios
+      let limpio = texto.replace(/\$/g, '').trim();
+      // Si tiene coma de miles y punto decimal (ej: "240,000.00"), quita la coma
+      if (limpio.includes(',') && limpio.includes('.')) {
+        limpio = limpio.replace(/,/g, '');
+      } 
+      // Si solo tiene coma como decimal (ej: "240000,00"), cámbiala por punto
+      else if (limpio.includes(',') && !limpio.includes('.')) {
+        limpio = limpio.replace(/,/g, '.');
+      }
+      return parseFloat(limpio) || 0;
     }
 
     const servicios = separarLista(params.get('servicios'));
@@ -253,21 +266,24 @@
     const formatoMoneda = new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     });
 
     const totalFilas = Math.max(servicios.length, cantidades.length, costos.length);
 
     for (let i = 0; i < totalFilas; i++) {
-      let rawCosto = (costos[i] || '0').replace(/\$/g, '').replace(/\./g, '').replace(',', '.').trim();
-      const valorNumerico = parseFloat(rawCosto) || 0;
+      const valorNumerico = limpiarNumero(costos[i]);
       sumaTotal += valorNumerico;
+
+      // Limpiar ceros innecesarios en cantidad (ej. "159.00" -> "159", "1.50" -> "1.5")
+      const cantNumerica = parseFloat((cantidades[i] || '0').replace(/,/g, '.')) || 0;
 
       const fila = document.createElement('tr');
       fila.innerHTML = `
         <td>${servicios[i] || 'Ítem ' + (i + 1)}</td>
         <td class="text-center">${unidades[i] || 'Und'}</td>
-        <td class="text-center">${cantidades[i] || '0'}</td>
+        <td class="text-center">${cantNumerica}</td>
         <td class="text-right">${formatoMoneda.format(valorNumerico)}</td>
       `;
       tbody.appendChild(fila);
