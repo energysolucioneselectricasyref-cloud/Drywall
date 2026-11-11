@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Factura / Cotización - Energy Soluciones</title>
-  <script src="https://jsdelivr.net"></script>
   <style>
     body {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -178,7 +177,9 @@
     <table width="100%">
       <tr>
         <td width="50%" valign="top">
-          <svg id="barcode-svg"></svg>
+          <div id="barcode-container" style="margin-top: 5px;">
+            <img id="barcode-img" alt="Código de Barras" style="max-width: 180px; height: auto; display: none;">
+          </div>
         </td>
         <td width="50%" valign="top">
           <table class="totals-table">
@@ -216,18 +217,12 @@
     document.getElementById('cli_tel').textContent = params.get('cli_tel') || '-';
     document.getElementById('direccion').textContent = params.get('direccion') || '-';
 
-    // Generar código de barras
-    const barcodeValue = params.get('barcode');
-    if (barcodeValue && typeof JsBarcode !== 'undefined') {
-      try {
-        JsBarcode("#barcode-svg", barcodeValue, {
-          format: "CODE128",
-          width: 1.8,
-          height: 45,
-          displayValue: true,
-          fontSize: 12
-        });
-      } catch (e) {}
+    // Generar código de barras mediante imagen directa (si no viene 'barcode', usa 'boleta')
+    const barcodeValue = params.get('barcode') || params.get('boleta');
+    const barcodeImg = document.getElementById('barcode-img');
+    if (barcodeValue && barcodeValue.trim() !== '') {
+      barcodeImg.src = `https://metafloor.com{encodeURIComponent(barcodeValue.trim())}&scale=2&height=10&includetext`;
+      barcodeImg.style.display = 'block';
     }
 
     // Separar listas usando "|" (o "," solo si no hay "|")
@@ -239,17 +234,13 @@
       return texto.split(',').map(item => item.trim());
     }
 
-    // Convertir texto numérico de AppSheet (ej. "$8,100.00" o "240000.00") a número real
+    // Convertir texto numérico de AppSheet a número real
     function limpiarNumero(texto) {
       if (!texto) return 0;
-      // Quita símbolo $ y espacios
       let limpio = texto.replace(/\$/g, '').trim();
-      // Si tiene coma de miles y punto decimal (ej: "240,000.00"), quita la coma
       if (limpio.includes(',') && limpio.includes('.')) {
         limpio = limpio.replace(/,/g, '');
-      } 
-      // Si solo tiene coma como decimal (ej: "240000,00"), cámbiala por punto
-      else if (limpio.includes(',') && !limpio.includes('.')) {
+      } else if (limpio.includes(',') && !limpio.includes('.')) {
         limpio = limpio.replace(/,/g, '.');
       }
       return parseFloat(limpio) || 0;
@@ -276,7 +267,6 @@
       const valorNumerico = limpiarNumero(costos[i]);
       sumaTotal += valorNumerico;
 
-      // Limpiar ceros innecesarios en cantidad (ej. "159.00" -> "159", "1.50" -> "1.5")
       const cantNumerica = parseFloat((cantidades[i] || '0').replace(/,/g, '.')) || 0;
 
       const fila = document.createElement('tr');
