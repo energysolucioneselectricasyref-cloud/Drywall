@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Factura / Cotización - Drywall</title>
-  <!-- Librería para generar el código de barras real a partir del parámetro barcode -->
   <script src="https://jsdelivr.net"></script>
   <style>
     body {
@@ -14,6 +13,17 @@
       padding: 20px;
       font-size: 13px;
       background-color: #f4f4f4;
+    }
+    .debug-box {
+      max-width: 800px;
+      margin: 0 auto 15px auto;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      word-break: break-all;
     }
     .invoice-box {
       max-width: 800px;
@@ -29,9 +39,7 @@
       padding-bottom: 15px;
       margin-bottom: 20px;
     }
-    .header td {
-      vertical-align: top;
-    }
+    .header td { vertical-align: top; }
     .company-name {
       font-size: 22px;
       font-weight: bold;
@@ -53,10 +61,7 @@
       border-radius: 5px;
       padding: 12px;
     }
-    .info-table td {
-      padding: 4px 8px;
-      vertical-align: top;
-    }
+    .info-table td { padding: 4px 8px; vertical-align: top; }
     .items-table {
       width: 100%;
       border-collapse: collapse;
@@ -112,20 +117,21 @@
       font-weight: bold;
       cursor: pointer;
     }
-    /* Oculta el botón de imprimir al generar el PDF o imprimir en papel */
     @media print {
       body { background-color: #ffffff; padding: 0; }
       .invoice-box { box-shadow: none; padding: 0; max-width: 100%; }
-      .btn-print { display: none; }
+      .btn-print, .debug-box { display: none; }
     }
   </style>
 </head>
 <body>
 
+  <!-- CUADRO DE DIAGNÓSTICO TEMPORAL -->
+  <div class="debug-box" id="debug-info">Cargando datos de URL...</div>
+
   <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 
   <div class="invoice-box">
-    <!-- ENCABEZADO -->
     <table class="header">
       <tr>
         <td>
@@ -143,7 +149,6 @@
       </tr>
     </table>
 
-    <!-- DATOS DEL CLIENTE Y PAGO -->
     <table class="info-table">
       <tr>
         <td width="55%">
@@ -158,7 +163,6 @@
       </tr>
     </table>
 
-    <!-- TABLA DE MATERIALES -->
     <table class="items-table">
       <thead>
         <tr>
@@ -168,12 +172,9 @@
           <th class="text-right">Subtotal</th>
         </tr>
       </thead>
-      <tbody id="tabla-materiales">
-        <!-- Se llena automáticamente con JavaScript -->
-      </tbody>
+      <tbody id="tabla-materiales"></tbody>
     </table>
 
-    <!-- TOTALES Y CÓDIGO DE BARRAS -->
     <table width="100%">
       <tr>
         <td width="50%" valign="top">
@@ -194,7 +195,6 @@
       </tr>
     </table>
 
-    <!-- PIE DE PÁGINA -->
     <div class="footer">
       Gracias por confiar en nosotros para su proyecto.<br>
       Documento generado desde AppSheet.
@@ -202,8 +202,15 @@
   </div>
 
   <script>
-    <script>
     const params = new URLSearchParams(window.location.search);
+
+    // Mostrar qué llegó exactamente en los parámetros de materiales
+    document.getElementById('debug-info').innerHTML = 
+      `<strong>Diagnóstico URL:</strong><br>` +
+      `servicios = "${params.get('servicios') || 'VACÍO'}"<br>` +
+      `cantidades = "${params.get('cantidades') || 'VACÍO'}"<br>` +
+      `p_unit = "${params.get('p_unit') || 'VACÍO'}"<br>` +
+      `unidades = "${params.get('unidades') || 'VACÍO'}"`;
 
     document.getElementById('tipo_doc').textContent = params.get('tipo_doc') || 'COTIZACIÓN';
     document.getElementById('boleta').textContent = params.get('boleta') || 'N/A';
@@ -216,9 +223,8 @@
     document.getElementById('cli_tel').textContent = params.get('cli_tel') || '-';
     document.getElementById('direccion').textContent = params.get('direccion') || '-';
 
-    // Código de barras
     const barcodeValue = params.get('barcode');
-    if (barcodeValue) {
+    if (barcodeValue && typeof JsBarcode !== 'undefined') {
       try {
         JsBarcode("#barcode-svg", barcodeValue, {
           format: "CODE128",
@@ -227,17 +233,12 @@
           displayValue: true,
           fontSize: 12
         });
-      } catch (e) {
-        console.error("Error generando código de barras:", e);
-      }
+      } catch (e) {}
     }
 
-    // Función auxiliar para separar listas sin importar si vienen con "|" o con ","
     function separarLista(texto) {
       if (!texto || texto.trim() === '') return [];
-      if (texto.includes('|')) {
-        return texto.split('|').map(item => item.trim());
-      }
+      if (texto.includes('|')) return texto.split('|').map(item => item.trim());
       return texto.split(',').map(item => item.trim());
     }
 
@@ -255,18 +256,16 @@
       minimumFractionDigits: 0
     });
 
-    // Usa el máximo de elementos disponibles entre servicios o cantidades
-    const totalFilas = Math.max(servicios.length, cantidades.length);
+    const totalFilas = Math.max(servicios.length, cantidades.length, costos.length);
 
     for (let i = 0; i < totalFilas; i++) {
-      // Limpia el formato de número colombiano (quita $ y puntos de miles, cambia coma decimal por punto)
       let rawCosto = (costos[i] || '0').replace(/\$/g, '').replace(/\./g, '').replace(',', '.').trim();
       const valorNumerico = parseFloat(rawCosto) || 0;
       sumaTotal += valorNumerico;
 
       const fila = document.createElement('tr');
       fila.innerHTML = `
-        <td>${servicios[i] || 'Material ' + (i + 1)}</td>
+        <td>${servicios[i] || 'Ítem ' + (i + 1)}</td>
         <td class="text-center">${unidades[i] || 'Und'}</td>
         <td class="text-center">${cantidades[i] || '0'}</td>
         <td class="text-right">${formatoMoneda.format(valorNumerico)}</td>
