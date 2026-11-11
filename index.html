@@ -221,7 +221,7 @@
     const barcodeValue = params.get('barcode') || params.get('boleta');
     const barcodeImg = document.getElementById('barcode-img');
     if (barcodeValue && barcodeValue.trim() !== '') {
-      barcodeImg.src = `https://metafloor.com{encodeURIComponent(barcodeValue.trim())}&scale=2&height=10&includetext`;
+      barcodeImg.src = `https://tec-it.com{encodeURIComponent(barcodeValue.trim())}&code=Code128&translate-esc=on`;
       barcodeImg.style.display = 'block';
     }
 
