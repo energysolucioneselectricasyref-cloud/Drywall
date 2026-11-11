@@ -5,172 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Factura / Cotización - Energy Soluciones</title>
   <style>
-    body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      color: #333333;
-      margin: 0;
-      padding: 20px;
-      font-size: 13px;
-      background-color: #f4f4f4;
-    }
-    .invoice-box {
-      max-width: 800px;
-      margin: auto;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      width: 100%;
-      border-bottom: 2px solid #e67e22;
-      padding-bottom: 15px;
-      margin-bottom: 20px;
-    }
+    body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 20px; font-size: 13px; background: #f4f4f4; }
+    .invoice-box { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .header { width: 100%; border-bottom: 2px solid #e67e22; padding-bottom: 15px; margin-bottom: 20px; }
     .header td { vertical-align: top; }
-    .company-name {
-      font-size: 20px;
-      font-weight: bold;
-      color: #2c3e50;
-      margin: 0 0 5px 0;
-    }
-    .company-details {
-      font-size: 12px;
-      color: #555555;
-      margin: 0;
-      line-height: 1.4;
-    }
-    .invoice-title {
-      font-size: 20px;
-      font-weight: bold;
-      color: #e67e22;
-      text-align: right;
-      margin: 0 0 5px 0;
-      text-transform: uppercase;
-    }
-    .info-table {
-      width: 100%;
-      margin-bottom: 20px;
-      background-color: #f8f9fa;
-      border-radius: 5px;
-      padding: 12px;
-    }
+    .company-name { font-size: 20px; font-weight: bold; color: #2c3e50; margin: 0 0 5px 0; }
+    .company-details { font-size: 12px; color: #555; margin: 0; line-height: 1.4; }
+    .invoice-title { font-size: 20px; font-weight: bold; color: #e67e22; text-align: right; margin: 0 0 5px 0; text-transform: uppercase; }
+    .info-table { width: 100%; margin-bottom: 20px; background: #f8f9fa; border-radius: 5px; padding: 12px; }
     .info-table td { padding: 4px 8px; vertical-align: top; }
-    .items-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 25px;
-    }
-    .items-table th {
-      background-color: #2c3e50;
-      color: #ffffff;
-      text-align: left;
-      padding: 10px;
-      font-weight: bold;
-    }
-    .items-table td {
-      border-bottom: 1px solid #dddddd;
-      padding: 10px;
-    }
+    .items-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+    .items-table th { background: #2c3e50; color: #fff; text-align: left; padding: 10px; font-weight: bold; }
+    .items-table td { border-bottom: 1px solid #ddd; padding: 10px; }
     .text-right { text-align: right; }
     .text-center { text-align: center; }
-    .totals-table {
-      width: 50%;
-      margin-left: auto;
-      border-collapse: collapse;
-    }
-    .totals-table td {
-      padding: 8px;
-      border-bottom: 1px solid #eeeeee;
-    }
-    .total-final {
-      font-size: 16px;
-      font-weight: bold;
-      background-color: #e67e22;
-      color: #ffffff;
-    }
-    .barcode-box {
-      display: inline-block;
-      text-align: center;
-      margin-top: 5px;
-    }
-    .barcode-text {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 12px;
-      font-weight: bold;
-      letter-spacing: 3px;
-      margin-top: 2px;
-      color: #000000;
-    }
-    .footer {
-      margin-top: 35px;
-      text-align: center;
-      font-size: 11px;
-      color: #777777;
-      border-top: 1px solid #dddddd;
-      padding-top: 15px;
-    }
-    .btn-print {
-      display: block;
-      width: 200px;
-      margin: 0 auto 20px auto;
-      padding: 10px;
-      background-color: #27ae60;
-      color: white;
-      text-align: center;
-      border: none;
-      border-radius: 5px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .totals-table { width: 50%; margin-left: auto; border-collapse: collapse; }
+    .totals-table td { padding: 8px; border-bottom: 1px solid #eee; }
+    .total-final { font-size: 16px; font-weight: bold; background: #e67e22; color: #fff; }
+    .barcode-box { display: inline-block; text-align: center; margin-top: 5px; }
+    .barcode-text { font-family: monospace; font-size: 12px; font-weight: bold; letter-spacing: 3px; margin-top: 2px; color: #000; }
+    .footer { margin-top: 35px; text-align: center; font-size: 11px; color: #777; border-top: 1px solid #ddd; padding-top: 15px; }
+    .btn-print { display: block; width: 200px; margin: 0 auto 20px auto; padding: 10px; background: #27ae60; color: #fff; text-align: center; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; }
     @media print {
-      body { background-color: #ffffff; padding: 0; }
+      body { background: #fff; padding: 0; }
       .invoice-box { box-shadow: none; padding: 0; max-width: 100%; }
       .btn-print { display: none; }
     }
   </style>
 </head>
 <body>
-
   <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
-
   <div class="invoice-box">
     <table class="header">
       <tr>
         <td width="60%">
           <p class="company-name">ENERGY SOLUCIONES ELÉCTRICAS Y REFRIGERACIÓN</p>
-          <p class="company-details">
-            Carrera 47 #13-48 E2 Barrio San José, Tierralta - Córdoba<br>
-            Tel: 324 243 2439<br>
-            Presupuesto y Detalle de Materiales Drywall
-          </p>
+          <p class="company-details">Carrera 47 #13-48 E2 Barrio San José, Tierralta - Córdoba<br>Tel: 324 243 2439<br>Presupuesto y Detalle de Materiales Drywall</p>
         </td>
         <td width="40%" class="text-right">
           <p class="invoice-title" id="tipo_doc">COTIZACIÓN</p>
-          <p>
-            <strong>N° Documento:</strong> <span id="boleta">-</span><br>
-            <strong>Fecha:</strong> <span id="fecha">-</span><br>
-            <strong>Estado:</strong> <span id="estado">-</span>
-          </p>
+          <p><strong>N° Documento:</strong> <span id="boleta">-</span><br><strong>Fecha:</strong> <span id="fecha">-</span><br><strong>Estado:</strong> <span id="estado">-</span></p>
         </td>
       </tr>
     </table>
-
     <table class="info-table">
       <tr>
-        <td width="55%">
-          <strong>Cliente:</strong> <span id="cliente">-</span><br>
-          <strong>ID / Documento:</strong> <span id="cli_id">-</span><br>
-          <strong>Teléfono:</strong> <span id="cli_tel">-</span>
-        </td>
-        <td width="45%">
-          <strong>Dirección:</strong> <span id="direccion">-</span><br>
-          <strong>Método de Pago:</strong> <span id="metodo_pago">-</span>
-        </td>
+        <td width="55%"><strong>Cliente:</strong> <span id="cliente">-</span><br><strong>ID / Documento:</strong> <span id="cli_id">-</span><br><strong>Teléfono:</strong> <span id="cli_tel">-</span></td>
+        <td width="45%"><strong>Dirección:</strong> <span id="direccion">-</span><br><strong>Método de Pago:</strong> <span id="metodo_pago">-</span></td>
       </tr>
     </table>
-
     <table class="items-table">
       <thead>
         <tr>
@@ -182,127 +65,76 @@
       </thead>
       <tbody id="tabla-materiales"></tbody>
     </table>
-
     <table width="100%">
       <tr>
-        <td width="50%" valign="top">
-          <div id="barcode-container" class="barcode-box"></div>
-        </td>
+        <td width="50%" valign="top"><div id="barcode-container" class="barcode-box"></div></td>
         <td width="50%" valign="top">
           <table class="totals-table">
-            <tr>
-              <td><strong>Subtotal:</strong></td>
-              <td class="text-right" id="subtotal-general">$ 0</td>
-            </tr>
-            <tr class="total-final">
-              <td>TOTAL A PAGAR:</td>
-              <td class="text-right" id="total-general">$ 0</td>
-            </tr>
+            <tr><td><strong>Subtotal:</strong></td><td class="text-right" id="subtotal-general">$ 0</td></tr>
+            <tr class="total-final"><td>TOTAL A PAGAR:</td><td class="text-right" id="total-general">$ 0</td></tr>
           </table>
         </td>
       </tr>
     </table>
-
-    <div class="footer">
-      Gracias por confiar en Energy Soluciones Eléctricas y Refrigeración.<br>
-      Documento generado desde AppSheet.
-    </div>
+    <div class="footer">Gracias por confiar en Energy Soluciones Eléctricas y Refrigeración.<br>Documento generado desde AppSheet.</div>
   </div>
-
   <script>
-    const params = new URLSearchParams(window.location.search);
+    const p = new URLSearchParams(window.location.search);
+    document.getElementById('tipo_doc').textContent = p.get('tipo_doc') || 'COTIZACIÓN';
+    document.getElementById('boleta').textContent = p.get('boleta') || 'N/A';
+    document.getElementById('fecha').textContent = p.get('fecha') || '-';
+    document.getElementById('estado').textContent = p.get('estado') || '-';
+    document.getElementById('metodo_pago').textContent = p.get('metodo_pago') || '-';
+    document.getElementById('cliente').textContent = p.get('mesa') || 'Cliente General';
+    document.getElementById('cli_id').textContent = p.get('cli_id') || '-';
+    document.getElementById('cli_tel').textContent = p.get('cli_tel') || '-';
+    document.getElementById('direccion').textContent = p.get('direccion') || '-';
 
-    document.getElementById('tipo_doc').textContent = params.get('tipo_doc') || 'COTIZACIÓN';
-    document.getElementById('boleta').textContent = params.get('boleta') || 'N/A';
-    document.getElementById('fecha').textContent = params.get('fecha') || '-';
-    document.getElementById('estado').textContent = params.get('estado') || '-';
-    document.getElementById('metodo_pago').textContent = params.get('metodo_pago') || '-';
-    
-    document.getElementById('cliente').textContent = params.get('mesa') || 'Cliente General';
-    document.getElementById('cli_id').textContent = params.get('cli_id') || '-';
-    document.getElementById('cli_tel').textContent = params.get('cli_tel') || '-';
-    document.getElementById('direccion').textContent = params.get('direccion') || '-';
-
-    function dibujarCodigoBarras(texto) {
-      if (!texto) return;
-      const limpio = '*' + texto.toUpperCase().replace(/[^0-9A-Z\-\.\ \$\/\+\%]/g, '') + '*';
-      const tablaCode39 = {
-        '0':'nnnwwnwnn','1':'wnnwnnnnw','2':'nnwwnnnnw','3':'wnwwnnnnn','4':'nnnwwnnnw',
-        '5':'wnnwwnnnn','6':'nnwwwnnnn','7':'nnnwnnwnw','8':'wnnwnnwnn','9':'nnwwnnwnn',
-        'A':'wnnnnwnnw','B':'nnwnnwnnw','C':'wnwnnwnnn','D':'nnnnwwnnw','E':'wnnnwwnnn',
-        'F':'nnwnwwnnn','G':'nnnnnwwnw','H':'wnnnnwwnn','I':'nnwnnwwnn','J':'nnnnwwwnn',
-        'K':'wnnnnnnww','L':'nnwnnnnww','M':'wnwnnnnwn','N':'nnnnwnnww','O':'wnnnwnnwn',
-        'P':'nnwnwnnwn','Q':'nnnnnnwww','R':'wnnnnnwwn','S':'nnwnnnwwn','T':'nnnnwnwwn',
-        'U':'wwnnnnnnw','V':'nwwnnnnnw','W':'wwwnnnnnn','X':'nwnnwnnnw','Y':'wwnnwnnnn',
-        'Z':'nwwnwnnnn','-':'nwnnnnwnw','.':'wwnnnnwnn',' ':'nwwnnnwnn','$':'nwnwnwnnn',
-        '/':'nwnwnnnwn','+':'nwnnnwnwn','%':'nnnwnwnwn','*':'nwnnwnwnn'
-      };
-
-      let x = 0;
-      const anchoFino = 1.6;
-      const anchoGrueso = 3.8;
-      const alto = 45;
-      let rects = '';
-
-      for (let i = 0; i < limpio.length; i++) {
-        const patron = tablaCode39[limpio[i]];
-        if (!patron) continue;
+    function drawBC(txt) {
+      if (!txt) return;
+      const clean = '*' + txt.toUpperCase().replace(/[^0-9A-Z\-\.\ \$\/\+\%]/g, '') + '*';
+      const c39 = {'0':'nnnwwnwnn','1':'wnnwnnnnw','2':'nnwwnnnnw','3':'wnwwnnnnn','4':'nnnwwnnnw','5':'wnnwwnnnn','6':'nnwwwnnnn','7':'nnnwnnwnw','8':'wnnwnnwnn','9':'nnwwnnwnn','A':'wnnnnwnnw','B':'nnwnnwnnw','C':'wnwnnwnnn','D':'nnnnwwnnw','E':'wnnnwwnnn','F':'nnwnwwnnn','G':'nnnnnwwnw','H':'wnnnnwwnn','I':'nnwnnwwnn','J':'nnnnwwwnn','K':'wnnnnnnww','L':'nnwnnnnww','M':'wnwnnnnwn','N':'nnnnwnnww','O':'wnnnwnnwn','P':'nnwnwnnwn','Q':'nnnnnnwww','R':'wnnnnnwwn','S':'nnwnnnwwn','T':'nnnnwnwwn','U':'wwnnnnnnw','V':'nwwnnnnnw','W':'wwwnnnnnn','X':'nwnnwnnnw','Y':'wwnnwnnnn','Z':'nwwnwnnnn','-':'nwnnnnwnw','.':'wwnnnnwnn',' ':'nwwnnnwnn','$':'nwnwnwnnn','/':'nwnwnnnwn','+':'nwnnnwnwn','%':'nnnwnwnwn','*':'nwnnwnwnn'};
+      let x = 0, r = '';
+      for (let i = 0; i < clean.length; i++) {
+        const pat = c39[clean[i]];
+        if (!pat) continue;
         for (let j = 0; j < 9; j++) {
-          const w = (patron[j] === 'w') ? anchoGrueso : anchoFino;
-          if (j % 2 === 0) {
-            rects += '<rect x="' + x + '" y="0" width="' + w + '" height="' + alto + '" fill="#000000"/>';
-          }
+          const w = pat[j] === 'w' ? 3.8 : 1.6;
+          if (j % 2 === 0) r += `<rect x="${x}" y="0" width="${w}" height="45" fill="#000"/>`;
           x += w;
         }
-        x += anchoFino;
+        x += 1.6;
       }
+      document.getElementById('barcode-container').innerHTML = `<svg width="${x}" height="45" viewBox="0 0 ${x} 45">${r}</svg><div class="barcode-text">${txt.toUpperCase()}</div>`;
+    }
+    const bc = p.get('barcode') || p.get('boleta');
+    if (bc && bc.trim()) drawBC(bc.trim());
 
-      const container = document.getElementById('barcode-container');
-      container.innerHTML = '<svg width="' + x + '" height="' + alto + '" viewBox="0 0 ' + x + ' ' + alto + '" xmlns="http://w3.org">' + rects + '</svg><div class="barcode-text">' + texto.toUpperCase() + '</div>';
+    function splitL(t) { return !t ? [] : (t.includes('|') ? t.split('|') : t.split(',')).map(s => s.trim()); }
+    function cleanN(t) {
+      if (!t) return 0;
+      let l = t.replace(/\$/g, '').trim();
+      if (l.includes(',') && l.includes('.')) l = l.replace(/,/g, '');
+      else if (l.includes(',')) l = l.replace(/,/g, '.');
+      return parseFloat(l) || 0;
     }
 
-    const barcodeValue = params.get('barcode') || params.get('boleta');
-    if (barcodeValue && barcodeValue.trim() !== '') {
-      dibujarCodigoBarras(barcodeValue.trim());
+    const srv = splitL(p.get('servicios')), cnt = splitL(p.get('cantidades')), und = splitL(p.get('unidades')), cst = splitL(p.get('p_unit'));
+    const tb = document.getElementById('tabla-materiales');
+    let tot = 0;
+    const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const maxF = Math.max(srv.length, cnt.length, cst.length);
+
+    for (let i = 0; i < maxF; i++) {
+      const val = cleanN(cst[i]);
+      tot += val;
+      const cNum = parseFloat((cnt[i] || '0').replace(/,/g, '.')) || 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${srv[i] || 'Ítem ' + (i+1)}</td><td class="text-center">${und[i] || 'Und'}</td><td class="text-center">${cNum}</td><td class="text-right">${fmt.format(val)}</td>`;
+      tb.appendChild(tr);
     }
-
-    function separarLista(texto) {
-      if (!texto || texto.trim() === '') return [];
-      if (texto.includes('|')) {
-        return texto.split('|').map(function(item) { return item.trim(); });
-      }
-      return texto.split(',').map(function(item) { return item.trim(); });
-    }
-
-    function limpiarNumero(texto) {
-      if (!texto) return 0;
-      let limpio = texto.replace(/\$/g, '').trim();
-      if (limpio.includes(',') && limpio.includes('.')) {
-        limpio = limpio.replace(/,/g, '');
-      } else if (limpio.includes(',') && !limpio.includes('.')) {
-        limpio = limpio.replace(/,/g, '.');
-      }
-      return parseFloat(limpio) || 0;
-    }
-
-    const servicios = separarLista(params.get('servicios'));
-    const cantidades = separarLista(params.get('cantidades'));
-    const unidades = separarLista(params.get('unidades'));
-    const costos = separarLista(params.get('p_unit'));
-
-    const tbody = document.getElementById('tabla-materiales');
-    let sumaTotal = 0;
-
-    const formatoMoneda = new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    });
-
-    const totalFilas = Math.max(servicios.length, cantidades.length, costos.length);
-
-    for (let i = 0; i < totalFilas; i++) {
-      const valorNumerico = limpiarNumero(costos[i]);
-      sumaTotal += valorNumerico;
-      const cantNumerica = parseFloat((cantidades[i] || '0').replace(/,/g, '.')) || 0;
+    document.getElementById('subtotal-general').textContent = fmt.format(tot);
+    document.getElementById('total-general').textContent = fmt.format(tot);
+  </script>
+</body>
+</html>
