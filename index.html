@@ -202,71 +202,78 @@
   </div>
 
   <script>
-    // 1. Leer todos los parámetros enviados desde AppSheet en la URL
+    <script>
     const params = new URLSearchParams(window.location.search);
 
-    // 2. Asignar datos generales (si no vienen en la URL, pone un valor por defecto)
     document.getElementById('tipo_doc').textContent = params.get('tipo_doc') || 'COTIZACIÓN';
     document.getElementById('boleta').textContent = params.get('boleta') || 'N/A';
     document.getElementById('fecha').textContent = params.get('fecha') || '-';
     document.getElementById('estado').textContent = params.get('estado') || '-';
     document.getElementById('metodo_pago').textContent = params.get('metodo_pago') || '-';
     
-    // En tu fórmula el nombre del cliente viene en el parámetro "mesa"
     document.getElementById('cliente').textContent = params.get('mesa') || 'Cliente General';
     document.getElementById('cli_id').textContent = params.get('cli_id') || '-';
     document.getElementById('cli_tel').textContent = params.get('cli_tel') || '-';
     document.getElementById('direccion').textContent = params.get('direccion') || '-';
 
-    // 3. Generar el código de barras visual
+    // Código de barras
     const barcodeValue = params.get('barcode');
     if (barcodeValue) {
-      JsBarcode("#barcode-svg", barcodeValue, {
-        format: "CODE128",
-        width: 1.8,
-        height: 45,
-        displayValue: true,
-        fontSize: 12
-      });
+      try {
+        JsBarcode("#barcode-svg", barcodeValue, {
+          format: "CODE128",
+          width: 1.8,
+          height: 45,
+          displayValue: true,
+          fontSize: 12
+        });
+      } catch (e) {
+        console.error("Error generando código de barras:", e);
+      }
     }
 
-    // 4. Procesar las listas de materiales separadas por "|"
-    const rawServicios = params.get('servicios') || '';
-    const rawCantidades = params.get('cantidades') || '';
-    const rawUnidades = params.get('unidades') || '';
-    const rawCostos = params.get('p_unit') || ''; // En tu fórmula envías Detalle_Materiales[Costo_Total]
+    // Función auxiliar para separar listas sin importar si vienen con "|" o con ","
+    function separarLista(texto) {
+      if (!texto || texto.trim() === '') return [];
+      if (texto.includes('|')) {
+        return texto.split('|').map(item => item.trim());
+      }
+      return texto.split(',').map(item => item.trim());
+    }
 
-    const servicios = rawServicios ? rawServicios.split('|') : [];
-    const cantidades = rawCantidades ? rawCantidades.split('|') : [];
-    const unidades = rawUnidades ? rawUnidades.split('|') : [];
-    const costos = rawCostos ? rawCostos.split('|') : [];
+    const servicios = separarLista(params.get('servicios'));
+    const cantidades = separarLista(params.get('cantidades'));
+    const unidades = separarLista(params.get('unidades'));
+    const costos = separarLista(params.get('p_unit'));
 
     const tbody = document.getElementById('tabla-materiales');
     let sumaTotal = 0;
 
-    // Formateador de moneda
     const formatoMoneda = new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
       minimumFractionDigits: 0
     });
 
-    for (let i = 0; i < servicios.length; i++) {
-      // Limpiar símbolos de moneda o comas si vienen en el texto
-      const valorNumerico = parseFloat((costos[i] || '0').replace(/[^0-9.-]+/g, '')) || 0;
+    // Usa el máximo de elementos disponibles entre servicios o cantidades
+    const totalFilas = Math.max(servicios.length, cantidades.length);
+
+    for (let i = 0; i < totalFilas; i++) {
+      // Limpia el formato de número colombiano (quita $ y puntos de miles, cambia coma decimal por punto)
+      let rawCosto = (costos[i] || '0').replace(/\$/g, '').replace(/\./g, '').replace(',', '.').trim();
+      const valorNumerico = parseFloat(rawCosto) || 0;
       sumaTotal += valorNumerico;
 
       const fila = document.createElement('tr');
       fila.innerHTML = `
-        <td>${servicios[i] || '-'}</td>
-        <td class="text-center">${unidades[i] || '-'}</td>
+        <td>${servicios[i] || 'Material ' + (i + 1)}</td>
+        <td class="text-center">${unidades[i] || 'Und'}</td>
         <td class="text-center">${cantidades[i] || '0'}</td>
         <td class="text-right">${formatoMoneda.format(valorNumerico)}</td>
       `;
       tbody.appendChild(fila);
     }
 
-    // 5. Mostrar totales
     document.getElementById('subtotal-general').textContent = formatoMoneda.format(sumaTotal);
     document.getElementById('total-general').textContent = formatoMoneda.format(sumaTotal);
   </script>
