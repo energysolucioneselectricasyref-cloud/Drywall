@@ -8,8 +8,9 @@
     body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 20px; font-size: 13px; background: #f4f4f4; }
     .invoice-box { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     .header { width: 100%; border-bottom: 2px solid #e67e22; padding-bottom: 15px; margin-bottom: 20px; }
-    .header td { vertical-align: top; }
-    .company-name { font-size: 20px; font-weight: bold; color: #2c3e50; margin: 0 0 5px 0; }
+    .header td { vertical-align: middle; }
+    .logo-img { max-width: 95px; max-height: 95px; object-fit: contain; margin-right: 12px; }
+    .company-name { font-size: 19px; font-weight: bold; color: #2c3e50; margin: 0 0 5px 0; }
     .company-details { font-size: 12px; color: #555; margin: 0; line-height: 1.4; }
     .invoice-title { font-size: 20px; font-weight: bold; color: #e67e22; text-align: right; margin: 0 0 5px 0; text-transform: uppercase; }
     .info-table { width: 100%; margin-bottom: 20px; background: #f8f9fa; border-radius: 5px; padding: 12px; }
@@ -38,11 +39,14 @@
   <div class="invoice-box">
     <table class="header">
       <tr>
-        <td width="60%">
+        <td width="15%">
+          <img src="Logos.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+        </td>
+        <td width="50%">
           <p class="company-name">ENERGY SOLUCIONES ELÉCTRICAS Y REFRIGERACIÓN</p>
           <p class="company-details">Carrera 47 #13-48 E2 Barrio San José, Tierralta - Córdoba<br>Tel: 324 243 2439<br>Presupuesto y Detalle de Materiales Drywall</p>
         </td>
-        <td width="40%" class="text-right">
+        <td width="35%" class="text-right">
           <p class="invoice-title" id="tipo_doc">COTIZACIÓN</p>
           <p><strong>N° Documento:</strong> <span id="boleta">-</span><br><strong>Fecha:</strong> <span id="fecha">-</span><br><strong>Estado:</strong> <span id="estado">-</span></p>
         </td>
