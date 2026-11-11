@@ -2,13 +2,26 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factura / Cotización - Drywall</title>
+  <!-- Librería para generar el código de barras real a partir del parámetro barcode -->
+  <script src="https://jsdelivr.net"></script>
   <style>
     body {
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       color: #333333;
       margin: 0;
-      padding: 25px;
+      padding: 20px;
       font-size: 13px;
+      background-color: #f4f4f4;
+    }
+    .invoice-box {
+      max-width: 800px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     .header {
       width: 100%;
@@ -31,16 +44,18 @@
       color: #e74c3c;
       text-align: right;
       margin: 0;
+      text-transform: uppercase;
     }
     .info-table {
       width: 100%;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       background-color: #f8f9fa;
       border-radius: 5px;
       padding: 12px;
     }
     .info-table td {
-      padding: 5px 8px;
+      padding: 4px 8px;
+      vertical-align: top;
     }
     .items-table {
       width: 100%;
@@ -58,14 +73,10 @@
       border-bottom: 1px solid #dddddd;
       padding: 10px;
     }
-    .text-right {
-      text-align: right;
-    }
-    .text-center {
-      text-align: center;
-    }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
     .totals-table {
-      width: 45%;
+      width: 50%;
       margin-left: auto;
       border-collapse: collapse;
     }
@@ -80,100 +91,185 @@
       color: #ffffff;
     }
     .footer {
-      margin-top: 40px;
+      margin-top: 35px;
       text-align: center;
       font-size: 11px;
       color: #777777;
       border-top: 1px solid #dddddd;
       padding-top: 15px;
     }
+    .btn-print {
+      display: block;
+      width: 180px;
+      margin: 0 auto 20px auto;
+      padding: 10px;
+      background-color: #27ae60;
+      color: white;
+      text-align: center;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    /* Oculta el botón de imprimir al generar el PDF o imprimir en papel */
+    @media print {
+      body { background-color: #ffffff; padding: 0; }
+      .invoice-box { box-shadow: none; padding: 0; max-width: 100%; }
+      .btn-print { display: none; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
-  <table class="header">
-    <tr>
-      <td>
-        <p class="company-name">CALCULADORA DRYWALL</p>
-        <p>Presupuesto y Detalle de Materiales<br>NIT / RUT: 000.000.000-0</p>
-      </td>
-      <td class="text-right">
-        <p class="invoice-title">FACTURA / COTIZACIÓN</p>
-        <p>
-          <strong>N° Proyecto:</strong> <<[ID_Proyecto]>><br>
-          <strong>Fecha:</strong> <<[Fecha]>>
-        </p>
-      </td>
-    </tr>
-  </table>
+  <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
 
-  <!-- DATOS DEL CLIENTE Y PROYECTO -->
-  <table class="info-table">
-    <tr>
-      <td width="50%">
-        <strong>Cliente:</strong> <<[Cliente].[Nombre]>><br>
-        <strong>Proyecto:</strong> <<[Nombre_Proyecto]>>
-      </td>
-      <td width="50%">
-        <strong>Medidas:</strong> <<[Largo_m]>> m x <<[Ancho_m]>> m<br>
-        <strong>Área Total:</strong> <<[Area_Total]>> m² (Desperdicio: <<[Porcentaje_Desperdicio]>>%)
-      </td>
-    </tr>
-  </table>
-
-  <!-- TABLA DE MATERIALES (RELACIONADA) -->
-  <table class="items-table">
-    <thead>
+  <div class="invoice-box">
+    <!-- ENCABEZADO -->
+    <table class="header">
       <tr>
-        <th>Material / Descripción</th>
-        <th class="text-center">Cantidad</th>
-        <th class="text-right">Precio Unit.</th>
-        <th class="text-right">Subtotal</th>
+        <td>
+          <p class="company-name">ENERGY SOLUCIONES ELÉCTRICAS Y REF.</p>
+          <p>Presupuesto y Detalle de Materiales Drywall</p>
+        </td>
+        <td class="text-right">
+          <p class="invoice-title" id="tipo_doc">COTIZACIÓN</p>
+          <p>
+            <strong>N° Documento:</strong> <span id="boleta">-</span><br>
+            <strong>Fecha:</strong> <span id="fecha">-</span><br>
+            <strong>Estado:</strong> <span id="estado">-</span>
+          </p>
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      <!-- INICIO DEL CICLO DE MATERIALES -->
-      <<Start: [Related Detalle_Materiales]>>
+    </table>
+
+    <!-- DATOS DEL CLIENTE Y PAGO -->
+    <table class="info-table">
       <tr>
-        <td><<[Material]>></td>
-        <td class="text-center"><<[Cantidad]>></td>
-        <td class="text-right"><<[Precio_Unitario]>></td>
-        <td class="text-right"><<[Subtotal]>></td>
+        <td width="55%">
+          <strong>Cliente:</strong> <span id="cliente">-</span><br>
+          <strong>ID / Documento:</strong> <span id="cli_id">-</span><br>
+          <strong>Teléfono:</strong> <span id="cli_tel">-</span>
+        </td>
+        <td width="45%">
+          <strong>Dirección:</strong> <span id="direccion">-</span><br>
+          <strong>Método de Pago:</strong> <span id="metodo_pago">-</span>
+        </td>
       </tr>
-      <<End>>
-      <!-- FIN DEL CICLO -->
-    </tbody>
-  </table>
+    </table>
 
-  <!-- TOTALES Y CÓDIGO DE BARRAS -->
-  <table width="100%">
-    <tr>
-      <td width="50%" valign="top">
-        <!-- Muestra la imagen del código de barras de tu tabla -->
-        <p><strong>Código de Control:</strong></p>
-        <img src="<<[Imagen_Codigo_Barra]>>" width="160" alt="Código de Barras">
-      </td>
-      <td width="50%" valign="top">
-        <table class="totals-table">
-          <tr>
-            <td><strong>Subtotal:</strong></td>
-            <td class="text-right"><<SUM([Related Detalle_Materiales][Subtotal])>></td>
-          </tr>
-          <tr class="total-final">
-            <td>TOTAL A PAGAR:</td>
-            <td class="text-right"><<SUM([Related Detalle_Materiales][Subtotal])>></td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+    <!-- TABLA DE MATERIALES -->
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th>Material / Descripción</th>
+          <th class="text-center">Unidad</th>
+          <th class="text-center">Cantidad</th>
+          <th class="text-right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-materiales">
+        <!-- Se llena automáticamente con JavaScript -->
+      </tbody>
+    </table>
 
-  <!-- PIE DE PÁGINA -->
-  <div class="footer">
-    Gracias por confiar en nosotros para su proyecto de Drywall.<br>
-    Documento generado automáticamente.
+    <!-- TOTALES Y CÓDIGO DE BARRAS -->
+    <table width="100%">
+      <tr>
+        <td width="50%" valign="top">
+          <svg id="barcode-svg"></svg>
+        </td>
+        <td width="50%" valign="top">
+          <table class="totals-table">
+            <tr>
+              <td><strong>Subtotal:</strong></td>
+              <td class="text-right" id="subtotal-general">$0</td>
+            </tr>
+            <tr class="total-final">
+              <td>TOTAL A PAGAR:</td>
+              <td class="text-right" id="total-general">$0</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- PIE DE PÁGINA -->
+    <div class="footer">
+      Gracias por confiar en nosotros para su proyecto.<br>
+      Documento generado desde AppSheet.
+    </div>
   </div>
+
+  <script>
+    // 1. Leer todos los parámetros enviados desde AppSheet en la URL
+    const params = new URLSearchParams(window.location.search);
+
+    // 2. Asignar datos generales (si no vienen en la URL, pone un valor por defecto)
+    document.getElementById('tipo_doc').textContent = params.get('tipo_doc') || 'COTIZACIÓN';
+    document.getElementById('boleta').textContent = params.get('boleta') || 'N/A';
+    document.getElementById('fecha').textContent = params.get('fecha') || '-';
+    document.getElementById('estado').textContent = params.get('estado') || '-';
+    document.getElementById('metodo_pago').textContent = params.get('metodo_pago') || '-';
+    
+    // En tu fórmula el nombre del cliente viene en el parámetro "mesa"
+    document.getElementById('cliente').textContent = params.get('mesa') || 'Cliente General';
+    document.getElementById('cli_id').textContent = params.get('cli_id') || '-';
+    document.getElementById('cli_tel').textContent = params.get('cli_tel') || '-';
+    document.getElementById('direccion').textContent = params.get('direccion') || '-';
+
+    // 3. Generar el código de barras visual
+    const barcodeValue = params.get('barcode');
+    if (barcodeValue) {
+      JsBarcode("#barcode-svg", barcodeValue, {
+        format: "CODE128",
+        width: 1.8,
+        height: 45,
+        displayValue: true,
+        fontSize: 12
+      });
+    }
+
+    // 4. Procesar las listas de materiales separadas por "|"
+    const rawServicios = params.get('servicios') || '';
+    const rawCantidades = params.get('cantidades') || '';
+    const rawUnidades = params.get('unidades') || '';
+    const rawCostos = params.get('p_unit') || ''; // En tu fórmula envías Detalle_Materiales[Costo_Total]
+
+    const servicios = rawServicios ? rawServicios.split('|') : [];
+    const cantidades = rawCantidades ? rawCantidades.split('|') : [];
+    const unidades = rawUnidades ? rawUnidades.split('|') : [];
+    const costos = rawCostos ? rawCostos.split('|') : [];
+
+    const tbody = document.getElementById('tabla-materiales');
+    let sumaTotal = 0;
+
+    // Formateador de moneda
+    const formatoMoneda = new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0
+    });
+
+    for (let i = 0; i < servicios.length; i++) {
+      // Limpiar símbolos de moneda o comas si vienen en el texto
+      const valorNumerico = parseFloat((costos[i] || '0').replace(/[^0-9.-]+/g, '')) || 0;
+      sumaTotal += valorNumerico;
+
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${servicios[i] || '-'}</td>
+        <td class="text-center">${unidades[i] || '-'}</td>
+        <td class="text-center">${cantidades[i] || '0'}</td>
+        <td class="text-right">${formatoMoneda.format(valorNumerico)}</td>
+      `;
+      tbody.appendChild(fila);
+    }
+
+    // 5. Mostrar totales
+    document.getElementById('subtotal-general').textContent = formatoMoneda.format(sumaTotal);
+    document.getElementById('total-general').textContent = formatoMoneda.format(sumaTotal);
+  </script>
 
 </body>
 </html>
